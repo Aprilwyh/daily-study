@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    // 2020-06-11 6.20-7.20
+
+    // codePointAt()
+    // ES5: charCodeAt
+
+    // String.fromCodePoint()
+    // ES5: String.fromCharCode
+    // 字符串遍历器接口
+    for (let code of 'foo') {
+      console.log(code); // "f" "o" "o"
+    }
+    var text = String.fromCodePoint(0x20BB7);
+    for (let i = 0; i < text.length; i++) {
+      console.log(text); // 输出两个 "𠮷", 书中例子是输出两个空，可能因为浏览器版本高？
+    }
+    for (let i of text) {
+      console.log(text); // 输出一个 "𠮷"
+    }
+    // at() // ES5: charAt() 返回字符串给定位置的字符
+    // 今日灵魂拷问：如何用ES5实现at功能？其他功能也可以试试
+
+    // normalize()
+    // 欧洲语言有语调和重音符号，后续补吧
+
+    // includes()、startsWith()、endsWith()
+    // ES5: indexOf() 确定一个字符串是否包含在另一个字符串中
+    var s = 'hello world';
+    s.startsWith('h'); // true, 以他开头
+    s.endsWith('l'); // false, 不以他结尾
+    s.includes('r'); // true, 包含他 太好了以后不用indexOf !== -1了
+    // 第二个参数表示开始搜索的位置
+    s.startsWith('h', 6); // false
+    s.endsWith('d', 1); // false endsWith和其他两个方法不同，它针对前n个字符。其他方法针对n到结束之间的字符
+    s.includes('r', 8); // true 说明从索引8开始且包含8
+
+    // repeat() 返回一个新字符串，将原字符串重复n次
+    'x'.repeat(3); // xxx
+    'hello'.repeat(2); // hellohello
+    'na'.repeat(0); // ""
+    'na'.repeat(2.9); // nana 参数是小数向下取整（* 0到-1的小数会被视为-0，等同于0）
+    // 参数如果是负数或者Infinity会报错
+    // 参数如果是字符串会转换成数字
+
+    // padStart()、padEnd() 字符串不够指定长度 头部补全/尾部补全
+    'x'.padStart(5, 'ab'); // ababx
+    'x'.padEnd(4, 'ab'); // xaba
+    // 原字符串的长度 >= 指定长度，返回原字符串（不会被截取）
+    // 原字符串长度 + 补全字符串长度 > 指定长度，截去超出位数的补全字符串
+    // 总之不会截掉原字符串，要么补要么不动他
+    'x'.padStart(2); // ' x' 省略第二个参数空格会补全
+    'x'.padEnd(2); // 'x '
+    // 用途是为数值补全指定位数、提示字符串格式等
+    '1'.padStart(3, '0'); // 001
+    '01-01'.padStart(10, 'YYYY-MM-DD'); // 'YYYY-01-01'
+  </script>
+</body>
+
+</html>

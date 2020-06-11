@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    let [foo, [[bar], baz]] = [1, [[2], 3]];
+    console.log(foo, bar, baz); // 1 2 3
+    let [, , third] = ["foo", "bar", "baz"];
+    console.log(third); // baz
+    let [x, , y] = [1, 2, 3];
+    console.log(x, y); // 1 3
+    let [head, ...tail] = [1, 2, 3, 4];
+    console.log(head, tail); // 1 [2, 3, 4]
+    let [a, b, ...c] = ['a'];
+    console.log(a, b, c); // a undefined []
+    let [i, j = 1] = [2, undefined];
+    console.log(j); // 1
+    /* let { fo: { ar } } = { az: 'az' };
+    console.log(fo); */
+    let { toString: s } = 123;
+    console.log(s === Number.prototype.toString); // true
+    // let [fo] = null; // TypeError: null is not iterable
+    // let { prop: fo } = null; // TypeError: Cannot destructure property `prop` of 'undefined' or 'null'.
+  </script>
+</body>
+
+</html>

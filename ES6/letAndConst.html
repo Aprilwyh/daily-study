@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div>
+    <div>
+      let命令<br>
+      不存在变量提升<br>
+      暂时性死区<br>
+      不允许重复声明<br>
+    </div>
+  </div>
+  <script>
+    // 不存在变量提升
+    console.log(foo); // undefined
+    var foo = 1;
+    /* console.log(fo);
+    let fo = 2; // 报错ReferenceError */
+    // 暂时性死区
+    var tmp = 123;
+    if (true) {
+      tmp = 'abc';
+      console.log(tmp); // 如果注释掉let tmp会输出 abc
+      //let tmp; // 报错ReferenceError，当前作用域内只要没有let tmp之前的tmp都会报错
+    }
+    function bar(x = y, y = 2) {
+      return [x, y];
+    }
+    // bar(); // ReferenceError,参数x等于参数y，但参数y还没有声明，属于死区
+    var x = x; // 不报错
+    // let y = y; // 报错
+    // 不允许重复声明
+    // 相同作用域内不允许重复声明
+    /* function func(arg) {
+      let arg; // 报错
+    } */
+    function func(arg1) {
+      {
+        let arg1; // 不报错
+      }
+    }
+
+  </script>
+</body>
+
+</html>
