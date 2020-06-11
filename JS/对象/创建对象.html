@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    // 2020-06-11 21.00-22.30
+    // 1.对象字面量形式
+    var empty = {};
+    var point = { x: 0, y: 0 };
+    var point2 = { x: point.x, y: point.y + 1 };
+    var book = {
+      "main title": "JS",
+      'sub-title': "xxx",
+      "for": "all",
+      author: {
+        firstName: "David",
+        surName: "xxxx"
+      }
+    };
+
+    // 2.通过new创建对象
+    var o = new Object();
+    var a = new Array();
+
+    // 3.工厂模式
+
+    // 通过Object.create("这个对象的原型", "对对象的属性进行进一步描述") 原型式继承
+    var o1 = Object.create({ x: 1, y: 2 }); // o1继承了属性x和y
+    var o2 = Object.create(null); // o2不继承任何属性和方法
+    var o3 = Object.create(Object.prototype); // o3和{}和new Object()一样
+
+
+  </script>
+</body>
+
+</html>
