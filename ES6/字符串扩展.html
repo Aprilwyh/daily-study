@@ -64,6 +64,36 @@
     // 用途是为数值补全指定位数、提示字符串格式等
     '1'.padStart(3, '0'); // 001
     '01-01'.padStart(10, 'YYYY-MM-DD'); // 'YYYY-01-01'
+
+    // 2020-06-12 6.50-7.20
+
+    // 模板字符串
+    // 字符串中嵌入变量,模板字符串中的变量没有声明会报错
+    var name = "Tom", time = "today";
+    `Hello ${name}, how are you ${time}?`
+    // 字符串中调用函数(假设fn已定义)
+    // `123 ${fn()} 456`
+    // trim方法消除模板字符串中的空格和缩进
+    /* $('#list').html(`
+    <ul>
+      <li>123</li>
+    </ul>
+    `.trim()); */
+    // ${}中的值不是字符串将转为字符串（默认调用toString()方法）
+    // 模板字符串可以嵌套
+    const tmp1 = addrs => `
+      <table>
+        ${addrs.map(addr => `
+          <tr><td>${addr.first}</td></tr>
+          <tr><td>${addr.last}</td></tr>
+        `).join('')}
+      </table>
+    `
+    const data = [
+      { first: '<Tom>', last: 'Bond' },
+      { first: 'Lars', last: '<Croft>' }
+    ];
+    console.log(tmp1(data));
   </script>
 </body>
 
