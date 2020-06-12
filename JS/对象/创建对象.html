@@ -25,18 +25,39 @@
       }
     };
 
-    // 2.通过new创建对象
+    // 2.通过new创建对象(Object构造函数)
     var o = new Object();
-    var a = new Array();
+    // 以上方法创建相似对象会产生大量重复代码
 
     // 3.工厂模式
+    function createPerson(name, age) {
+      var o = new Object();
+      o.name = name;
+      o.age = age;
+      o.sayName = function () {
+        alert(this.name);
+      }
+      return o;
+    }
+    var person1 = createPerson('Tom', 15);
+    var person2 = createPerson('Jerry', 13);
+    // 没有解决对象识别问题（不知道一个对象的类型）
+
+    // 4.构造函数模式
+    function Person(name, age) {
+      this.name = name;
+      this.age = age;
+      this.sayName = function () {
+        alert(this.name);
+      }
+    }
+    var person3 = new Person('cat', 4);
+    var person4 = new Person('dog', 5);
 
     // 通过Object.create("这个对象的原型", "对对象的属性进行进一步描述") 原型式继承
     var o1 = Object.create({ x: 1, y: 2 }); // o1继承了属性x和y
     var o2 = Object.create(null); // o2不继承任何属性和方法
     var o3 = Object.create(Object.prototype); // o3和{}和new Object()一样
-
-
   </script>
 </body>
 
