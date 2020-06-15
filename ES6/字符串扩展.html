@@ -102,6 +102,27 @@
     let func2 = eval.call(null, str2);
     console.log(func2('Jerry')); // Hello Jerry
 
+    // 2020-06-15 6.30-7.20
+
+    // 标签模板
+    alert`123`;
+    alert(123); // 与上面相等
+    var a = 5;
+    var b = 10;
+    tag`Hello ${a + b} world ${a * b}`;
+    tag(['Hello', 'world', ''], 15, 50); // 与上面相等
+    // tag的第一个参数是数组，成员是模板字符串中没有变量替换的部分
+    function tag(s, v1, v2) {
+      console.log(s[0]); // Hello
+      console.log(s[1]); // world
+      console.log(s[2]); // 
+      console.log(v1); // 15
+      console.log(v2); // 50
+      return "OK";
+    }
+    // 将各个参数按照原来的位置拼接回去
+
+
   </script>
 </body>
 
