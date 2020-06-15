@@ -13,11 +13,23 @@ const store = new Vuex.Store({
     count: 0,
     color: 'red',
     name: 'Tom',
-    age: 22
+    age: 22,
+    todos: [{ id: 1, text: 51 }, { id: 2, text: 22 }, { id: 3, text: 40 }]
   },
   mutations: {
     increment(state) {
       state.count++
+    }
+  },
+  getters: { // 在学习getter的时候你会用到它
+    doneTodos: state => {
+      return state.todos.filter(todo => todo.text > 30); // 例子，过滤text大于30的数据
+    },
+    doneTodosCount: (state, getters) => { // 也能接受其他getter做第二个参数
+      return getters.doneTodos.length; // 在其他getter基础上做点什么事情
+    },
+    getTodoById: (state) => (id) => {
+      return state.todos.find(todo => todo.id === id);
     }
   }
 })

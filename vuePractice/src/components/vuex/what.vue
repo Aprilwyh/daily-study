@@ -3,10 +3,13 @@
   <div>
     {{ count }}
     <my-state></my-state>
+    <hr />
+    <my-getter></my-getter>
   </div>
 </template>
 <script>
 import state from "./state";
+import getter from "./getter";
 export default {
   // state 驱动应用的数据源
   data() {
@@ -27,7 +30,8 @@ export default {
     }
   },
   components: {
-    "my-state": state
+    "my-state": state,
+    "my-getter": getter
   }
 };
 </script>
