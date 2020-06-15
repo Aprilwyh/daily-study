@@ -120,8 +120,33 @@
       console.log(v2); // 50
       return "OK";
     }
+    // 2020-06-16 6.45-7.20
     // 将各个参数按照原来的位置拼接回去
-
+    var total = 30;
+    var msg = passthru`The total is ${total} (${total * 1.05} with tax) `;
+    /* function passthru(literals) { // literals = ["The total is ", " (", " with tax)"]
+      var result = '';
+      var i = 0;
+      while (i < literals.length) {
+        result += literals[i++];
+        if (i < arguments.length) { // arguments = ([literals], 30, 31.5)
+          result += arguments[i];
+        }
+      }
+      return result;
+    }
+    console.log(msg); // The total is 30 (31.5 with tax) */
+    // 采用rest参数的写法
+    function passthru(literals, ...values) { // values = [30, 31.5]
+      var output = "";
+      for (var index = 0; index < values.length; index++) {
+        output += literals[index] + values[index];
+      }
+      output += literals[index];
+      return output;
+    }
+    console.log(msg); // The total is 30 (31.5 with tax)
+    // 标签模板的应用
 
   </script>
 </body>
