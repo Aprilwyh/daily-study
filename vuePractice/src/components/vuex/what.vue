@@ -5,11 +5,14 @@
     <my-state></my-state>
     <hr />
     <my-getter></my-getter>
+    <hr />
+    <my-mutation></my-mutation>
   </div>
 </template>
 <script>
 import state from "./state";
 import getter from "./getter";
+import mutation from "./mutation";
 export default {
   // state 驱动应用的数据源
   data() {
@@ -31,7 +34,8 @@ export default {
   },
   components: {
     "my-state": state,
-    "my-getter": getter
+    "my-getter": getter,
+    "my-mutation": mutation
   }
 };
 </script>

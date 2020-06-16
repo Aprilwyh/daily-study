@@ -4,6 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import Vuex from 'vuex'
+// 在你学习mutation的时候会用到它
+// 假设mutation-types.js文件中导出变量 export const SOME_MUTATION = 'SOME_MUTATION'
+// 假设我们在这里导入这个变量 import { SOME_MUTATION } from './mutation-types'
 
 Vue.config.productionTip = false
 Vue.use(Vuex)
@@ -19,7 +22,24 @@ const store = new Vuex.Store({
   mutations: {
     increment(state) {
       state.count++
+    },
+    // 以下在学习mutation的时候会用到
+    payload(state, color) {
+      state.color = color // 通过载荷可以改变state中的color
+    },
+    payloadObj(state, payload) {
+      state.name = payload.friend
+    },
+    incrementObj(state, payload) {
+      state.age += payload.age // 22 + 18
     }
+    // 使用常量替代Mutation事件类型
+    // [SOME_MUTATION](state) {
+    // ...
+    // }
+
+    // Mutation必须是 同步函数！ 为什么？官网解释的很详细~~
+    // 在 mutation 中混合异步调用会导致你的程序很难调试，那我要处理异步怎么办？Action哦！！
   },
   getters: { // 在学习getter的时候你会用到它
     doneTodos: state => {
