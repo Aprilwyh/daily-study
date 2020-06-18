@@ -147,7 +147,41 @@
     }
     console.log(msg); // The total is 30 (31.5 with tax)
     // 标签模板的应用
+    // 1. 过滤HTML字符串，防止用户的恶意输入
+    var sender = '<h1>大标题</h1>';
+    var message = SaferHTML`${sender} <p>${sender} has sent you a message</p>`;
+    function SaferHTML(template) {
+      console.log(template); // ["", " <p>", " has sent you a message</p>"]
+      var s = template[0]; // 取出
+      for (var i = 1; i < arguments.length; i++) {
+        var arg = arguments[i];
+        s += arg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        s += template[i];
+      }
+      console.log(s); // &lt;h1&gt;大标题&lt;/h1&gt; <p>&lt;h1&gt;大标题&lt;/h1&gt; has sent you a message</p>
+      return s;
+    }
+    // 2. 多语言转换（国际化处理）,后续再说
+    // 3. 使用标签模板嵌入其他语言
+    // java`...省略java代码`
 
+    // String.raw() 用来充当模板字符串的处理函数，返回一个反斜线都被转义的字符串，对应替换变量后的模板字符串
+    String.raw`Hi\n${2 + 3}`; // "Hi\n5" 和书中有出入，待确定
+    // 正常情况下不用把String.raw当成函数调用，下面模拟一下String.raw的实现
+    String.raw = function (strings, ...values) {
+      var output = "";
+      for (var i = 0; i < values.length; i++) {
+        output += strings.raw[i] + values[i];
+      }
+      output += strings.raw[i];
+      return output;
+    }
+    console.log(String.raw({ raw: 'test' }, 0, 1, 2)); // 't0e1s2t'
+    // 等同于 String.raw({ raw: ['t', 'e', 's', 't'] }, 0, 1, 2);
+
+    // 模板字符串的限制
+    // 标签模板可以内嵌其他语言
+    // 模板字符串默认会将字符串转义，导致无法嵌入其他语言
   </script>
 </body>
 
