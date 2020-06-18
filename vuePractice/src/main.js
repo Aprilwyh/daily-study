@@ -32,7 +32,7 @@ const store = new Vuex.Store({
     },
     incrementObj(state, payload) {
       state.age += payload.age // 22 + 18
-    }
+    },
     // 使用常量替代Mutation事件类型
     // [SOME_MUTATION](state) {
     // ...
@@ -40,6 +40,26 @@ const store = new Vuex.Store({
 
     // Mutation必须是 同步函数！ 为什么？官网解释的很详细~~
     // 在 mutation 中混合异步调用会导致你的程序很难调试，那我要处理异步怎么办？Action哦！！
+  },
+  // Action来了！ 2020-06-18
+  actions: { // 注册action
+    // increment(context) {
+    //   context.commit('increment');
+    // } // 简化
+    increment({ commit }) {
+      commit('increment');
+    },
+    // 不同于其他属性只能拿着state或者getters还能拿着getters玩玩，actions可以玩的东西就多了
+    // 它接受一个与store实例具有相同方法和属性的context对象，那么
+    // 通过context就可以调用context.commit提交一个mutation，或者通过context.state、context.getters玩玩state、getters
+    // 但context就是context，它不是store实例本身。为什么呢？ 去看看Module哦！！
+
+    // 在 action 内部执行异步操作
+    incrementAsync({ commit }) {
+      setTimeout(() => {
+        commit('increment');
+      }, 1000)
+    }
   },
   getters: { // 在学习getter的时候你会用到它
     doneTodos: state => {

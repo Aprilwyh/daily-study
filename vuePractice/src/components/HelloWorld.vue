@@ -4,7 +4,8 @@
       <!-- <my-slot></my-slot> -->
       <router-link to="/slot">插槽部分</router-link>
       <!-- <my-render></my-render> -->
-      <router-link to="/render">渲染函数部分</router-link>==路由部分==
+      <router-link to="/render">渲染函数部分</router-link>
+      <br />==路由部分==
       <my-route></my-route>
       <router-link to="vuex">vuex部分</router-link>
     </div>
