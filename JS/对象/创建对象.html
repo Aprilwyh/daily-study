@@ -35,12 +35,13 @@
       o.name = name;
       o.age = age;
       o.sayName = function () {
-        alert(this.name);
+        alert(this.name + '来自工厂函数');
       }
       return o;
     }
     var person1 = createPerson('Tom', 15);
     var person2 = createPerson('Jerry', 13);
+    person2.sayName();
     // 【缺点】 没有解决对象识别问题（不知道一个对象的类型）
 
     // 4.构造函数模式
@@ -48,13 +49,14 @@
       this.name = name;
       this.age = age;
       this.sayName = function () {
-        alert(this.name);
+        alert(this.name + '来自构造函数');
       }
       // this.sayName = new Function("alert(this.name)"); // 与声明函数在逻辑上是等价的
     }
     // 当作构造函数使用
     var person3 = new Person('cat', 4);
     var person4 = new Person('dog', 5);
+    person4.sayName();
     // 创建自定义的构造函数可以将它的实例标识为一种特定的类型（胜过工厂模式的地方）
     // 作为普通函数调用
     Person('xiaoming', 7); // 添加到window
@@ -65,7 +67,21 @@
     // 可以把函数提出来定义到构造函数外部, 这样每个实例对象都会共享这个全局的函数
     // 【缺点】 全局作用域定义的函数只能被某个对象调用；对象需要定义多个方法就要定义多个全局函数
 
+    // 2020-06-17 21.30-22.00
     // 5. 原型模式
+    function Person1() {
+    }
+    Person1.prototype.name = "Tom";
+    Person1.prototype.age = 29;
+    Person1.prototype.sayName = function () {
+      alert(this.name + '来自原型');
+    };
+    var person5 = new Person1();
+    person5.sayName();
+    var person6 = new Person1();
+    console.log(person5.sayName === person6.sayName); // true
+    // 将sayName()方法和属性直接添加到Person的prototype属性中，构造函数变成空函数
+    // 通过调用空的构造函数来创建新对象，新对象有相同的属性和方法且所有实例都共享
 
     // 通过Object.create("这个对象的原型", "对对象的属性进行进一步描述") 原型式继承
     var o1 = Object.create({ x: 1, y: 2 }); // o1继承了属性x和y
