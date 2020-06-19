@@ -90,6 +90,9 @@ const store = new Vuex.Store({
       ))
     },
     async actionB({ dispatch, commit }) {
+      // store.dispatch 在不同模块中可以触发多个 action 函数
+      // 只有当所有触发函数完成后，返回的 Promise 才会执行
+      // 即返回的Promise被store.dispatch处理
       await dispatch('actionA') // 等待actionA完成
       commit('testB', await (
         console.log("[组合后]actionB:" + store.state.color)
