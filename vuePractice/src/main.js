@@ -31,7 +31,7 @@ const store = new Vuex.Store({
       state.name = payload.friend
     },
     incrementObj(state, payload) {
-      state.age += payload.age // 22 + 18
+      state.age += payload.age
     },
     // 使用常量替代Mutation事件类型
     // [SOME_MUTATION](state) {
@@ -40,14 +40,20 @@ const store = new Vuex.Store({
 
     // Mutation必须是 同步函数！ 为什么？官网解释的很详细~~
     // 在 mutation 中混合异步调用会导致你的程序很难调试，那我要处理异步怎么办？Action哦！！
+    testA(state) { // 仅给组合actionA测试用
+      state.color = 'pink'
+    },
+    testB(state) { // 仅给组合actionB测试用
+      state.color = 'purple'
+    }
   },
   // Action来了！ 2020-06-18
   actions: { // 注册action
     // increment(context) {
     //   context.commit('increment');
-    // } // 简化
+    // } // 参数解构简化代码
     increment({ commit }) {
-      commit('increment');
+      commit('increment')
     },
     // 不同于其他属性只能拿着state或者getters还能拿着getters玩玩，actions可以玩的东西就多了
     // 它接受一个与store实例具有相同方法和属性的context对象，那么
@@ -57,8 +63,37 @@ const store = new Vuex.Store({
     // 在 action 内部执行异步操作
     incrementAsync({ commit }) {
       setTimeout(() => {
-        commit('increment');
+        commit('increment')
       }, 1000)
+    },
+    incrementObj({ commit }, age) {
+      commit('incrementObj', age) // 接收递过来的载荷。组件中分发action，提交mutation，在提交的时候传入所需载荷
+    },
+    // 组合多个action处理更加复杂的异步流程
+    /* actionA({ commit }) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          commit('testA')
+          resolve()
+        }, 1000)
+      })
+    },
+    actionB({ dispatch, commit }) {
+      return dispatch('actionA').then(() => {
+        commit('testB')
+      })
+    } */
+    // 组合上述代码
+    async actionA({ commit }) {
+      commit('testA', await (
+        console.log("[组合后]actionA:" + store.state.color)
+      ))
+    },
+    async actionB({ dispatch, commit }) {
+      await dispatch('actionA') // 等待actionA完成
+      commit('testB', await (
+        console.log("[组合后]actionB:" + store.state.color)
+      ))
     }
   },
   getters: { // 在学习getter的时候你会用到它
