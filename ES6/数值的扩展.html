@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    // 2020-06-19 6.40-7.20
+
+    // 二进制0b / 0B，八进制0o / 0O， 十六进制0x / 0X
+    // n进制字符串数值转为十进制数值，使用Number方法
+    Number('0b111'); // 7
+    // Number.isFinite() NUmber.isNaN()
+    Number.isFinite(15); // true
+    Number.isFinite(Infinity); // false
+    // ES5
+    (function (global) {
+      var global_isFinite = global.isFinite;
+      Object.defineProperty(Number, 'isFinite', {
+        value: function isFinite(value) {
+          return typeof value === 'number' && global_isFinite(value);
+        },
+        configurable: true,
+        enumerable: true,
+        writeable: true
+      })
+    })(this);
+  </script>
+</body>
+
+</html>
