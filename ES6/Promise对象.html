@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    var x, y = 2;
+    console.log(x + y); // NaN
+
+    // 回调函数的方式 等他们都准备好再进行运算
+    function add(getX, getY, sum) {
+      var x, y;
+      getX(function (xVal) {
+        x = xVal;
+        if (y != undefined) {
+          sum(x + y);
+        }
+      });
+      getY(function (yVal) {
+        y = yVal;
+        if (x != undefined) {
+          sum(x + y);
+        }
+      })
+    }
+    // fetchX()和 FetchY()是同步或者异步函数
+    /* add(fetchX, fetchY, function (sum) {
+      console.log(sum);
+    }) */
+
+    // Promise的方式
+    function addP(xPromise, yPromise) {
+      // Promise.all([..])接受Promise数组并返回一个新的Promise
+      // 新的Promise等待数组中的所有promise完成
+      return Promise.all([xPromise, yPromise])
+        // promise决议后取得x、y并相加
+        .then(function (values) {
+          return values[0] + values[1];
+        });
+    }
+    /* addP(fetchX(), fetchY())
+      // 得到一个这两个数组的和的promise
+      // 调用then等到返回promise的决议
+      .then(function (sum) {
+        console.log(sum);
+      }); */
+
+    // Promise对象的简单例子
+    function timeout(ms) {
+      // 调用之后立即执行, 返回一个Promise实例，表示1秒后会发生的结果
+      return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms, 'done');
+      });
+    }
+    // 1秒后Promise实例状态变为Resolved，就会触发then方法绑定的回调函数
+    timeout(1000).then((value) => {
+      console.log(value); // 1秒之后输出 done
+    });
+
+    // Promise新建之后立即执行
+    let pro = new Promise((resolve, reject) => {
+      console.log('执行Promise'); // ①
+      resolve();
+    });
+    pro.then(() => {
+      console.log('Promise执行完毕') // ③
+    });
+    console.log('测试'); // ②
+  </script>
+</body>
+
+</html>
