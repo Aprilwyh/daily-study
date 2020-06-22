@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const arr1 = new Array(100).fill(0).map((item, index) => index + 1)
+        console.log(arr1) // [1-100]
+        const arr2 = Array.from(Array(100), (v, k) => k + 1)
+        console.log(arr2) // [1-100]
+        const arr3 = [...Array(100).keys()]
+        console.log(arr3) // [0-99]
+
+
+        const arr4 = [1, 2, 3]
+        const arrClone1 = [...arr4]
+        console.log(arrClone1) // [1, 2, 3]
+        const arrClone2 = arr4.slice(0, arr4.length)
+        console.log(arrClone2) // [1, 2, 3]
+        const arrClone3 = Array.from(arr4)
+        console.log(arrClone3) // [1, 2, 3]
+
+
+        const arr5 = [4, 5, 6]
+        const arrMerge1 = [...arr4, ...arr5]
+        console.log(arrMerge1) // [1, 2, 3, 4, 5, 6]
+        const arrMerge2 = arr4.concat(arr5)
+        console.log(arrMerge2) // [1, 2, 3, 4, 5, 6]
+
+
+        const arr6 = [1, 1, 2, 3, 4, 4]
+        const arrRemove = [...new Set(arr6)]
+        console.log(arrRemove) // [1, 2, 3, 4]
+
+
+        const arr7 = [1, 2, 3, 4]
+        const arr8 = [3, 4, 5, 6]
+        const arrDupl = [...new Set(arr7)].filter(item => arr8.includes(item))
+        console.log(arrDupl) // [3, 4]
+        const arrDiff = [...new Set([...arr7, ...arr8])].filter(item => !arr8.includes(item) || !arr7.includes(item))
+        console.log(arrDiff) // [1, 2, 5, 6]
+
+
+        const arrObj1 = { ...arr6 }
+        console.log(arrObj1) // {0: 1, 1: 1, 2: 2, 3: 3, 4: 4, 5: 4}
+        /* // 对象转数组不能用展开操作符，因为展开操作符必须用在可迭代对象上
+        let newArr = [...obj] // Uncaught TypeError: object is not iterable...
+        // 可以使用Array.form()将类数组对象转为数组
+        let newArr = Array.from(obj) // [0, 1, 2] */
+
+
+        const obj = { a: 'happy', b: 'fine', c: 'well' }
+        const getName = function (item) { return item.includes('e') }
+        const arrFlat = Object.values(obj).flat().filter(getName)
+        console.log(arrFlat) // ["fine", "well"]
+
+
+
+    </script>
+</body>
+
+</html>
