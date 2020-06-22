@@ -30,6 +30,40 @@
         writeable: true
       })
     })(this);
+    // 2020-06-23 6.30-7.20
+    (function (global) {
+      var global_isNaN = global.isNaN;
+      Object.defineProperty(Number, 'isNaN', {
+        value: function isNaN(value) {
+          return typeof value === 'number' && global_isNaN(value);
+        },
+        configurable: true,
+        enumerable: false,
+        writable: true
+      });
+    })(this);
+    // 新方法与传统方法的区别
+    // 传统方法先调用Number()将非数值转为数值再进行判断
+    // 新方法只对数值有效，非数值一律false
+
+    // Number.parseInt() / Number.parseFloat() 同ES5
+    // Number.isInteger()
+    // Number.EPSILON 极小常量不是方法，表示可以接受的误差范围
+    function withinErrorMargin(left, right) {
+      return Math.abs(left - right) < Number.EPSILON;
+    }
+    withinErrorMargin(0.1 + 0.2, 0.3) // true
+
+    // js能够表示的整数范围在-2sub53到2sub53之间（不含两个端点）
+    // Number.MAX_SAFE_INTEGER、Number.MIN_SAFE_INTEGER 常量
+    // Number.isSafeInteger() 判断整数是否在这个范围内
+
+    // Math.trunc() 直接砍掉小数点后面，不用考虑正负（Math.ceil()和Math.floor()需要考虑正负）
+    // Math.sign()
+    // Math.cbrt() 立方根
+    // Math.clz32() js的整数使用32位二进制形式表示
+
+
   </script>
 </body>
 
