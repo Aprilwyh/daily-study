@@ -9,6 +9,8 @@
     <my-mutation></my-mutation>
     <hr />
     <my-action></my-action>
+    <hr />
+    <my-module></my-module>
   </div>
 </template>
 <script>
@@ -16,6 +18,7 @@ import state from "./state";
 import getter from "./getter";
 import mutation from "./mutation";
 import action from "./action";
+import module from "./module";
 export default {
   // state 驱动应用的数据源
   data() {
@@ -39,7 +42,8 @@ export default {
     "my-state": state,
     "my-getter": getter,
     "my-mutation": mutation,
-    "my-action": action
+    "my-action": action,
+    "my-module": module
   }
 };
 </script>

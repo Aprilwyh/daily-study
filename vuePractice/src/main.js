@@ -11,6 +11,48 @@ import Vuex from 'vuex'
 Vue.config.productionTip = false
 Vue.use(Vuex)
 
+const moduleA = {
+  // 带命名空间的模块，模块被注册后所有 getter、action 及 mutation 都会自动根据模块注册的路径调整命名
+  // 比如count是a.getters.doubleCount，不是store.getters.doubleCount
+  namespaced: true,
+  state: () => ({
+    count: 8
+  }),
+  /* state: {
+    count: 8
+  }, */
+  // 以上两种写法有什么不一样？？ 见markdown详解
+  // 对于模块内部的 mutation 和 getter，接收的第一个参数是模块的局部状态对象
+  mutations: {
+    incrementMu(state) { // 这里的 `state` 对象是模块的局部状态
+      state.count++
+    }
+  },
+  getters: {
+    doubleCount(state) {
+      return state.count * 2
+    },
+    // 对于模块内部的 getter，根节点状态会作为第三个参数暴露出来
+    // 使用namespaced: true 后，使用全局getter可以添加第四个参数
+    sumWithRootCount(state, getters, rootState, rootGetters) {
+      return state.count + rootState.count // 10 + 3
+    }
+  },
+  // 对于模块内部的 action，局部状态通过 context.state 暴露出来，根节点状态则为 context.rootState
+  actions: {
+    incrementIfOddOnRootSum({ state, commit, rootState, rootGetters }) {
+      console.log(state.count) // 9，自己的
+      console.log(rootState.count) // 3，爸爸的
+      if ((state.count + rootState.count) % 2 === 0) {
+        commit('incrementMu') // 自己的
+        commit('increment', null, { root: true }) // 爸爸的
+        // dispatch也可以使用{ root: true }，作为第三个参数传递给dispatch
+        // dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+      }
+    }
+  },
+}
+
 const store = new Vuex.Store({
   state: {
     count: 0,
@@ -109,8 +151,27 @@ const store = new Vuex.Store({
     getTodoById: (state) => (id) => {
       return state.todos.find(todo => todo.id === id);
     }
+  },
+  modules: {
+    a: moduleA
   }
 })
+
+// 注册模块 `myModule`
+store.registerModule('myModule', {
+  // ...
+})
+// 注册嵌套模块 `nested/myModule`
+// store.registerModule(['nested', 'myModule'], {
+//   // ...会报错，不知道为啥
+// })
+// 通过 store.state.myModule 和 store.state.nested.myModule 访问模块的状态
+// 使用 store.unregisterModule(moduleName) 来动态卸载模块
+// 通过 store.hasModule(moduleName) 方法检查该模块是否已经被注册到 store
+store.registerModule('a', module, {
+  preserveState: true // 保留store的state，action、mutation 和 getter 会被添加到 store 中，state不会（这样就不会覆盖）
+})
+
 // 通过store.state获取状态对象
 // 通过store.commit方法触发状态变更
 /* store.commit('increment')
