@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    function Person() { }
+    Person.prototype.name = 'Tom'
+    Person.prototype.age = 29
+    Person.prototype.sayName = function () {
+      alert(this.name + '来自原型')
+    }
+    var person1 = new Person()
+    var person2 = new Person()
+    // alert(Person.prototype.isPrototypeOf(person1)) // true 有指向关系
+    // alert(Object.getPrototypeOf(person1).name) // Tom 来自原型
+
+    person1.name = 'Jerry'
+    // alert(person1.hasOwnProperty('name')) // true 来自实例
+    // alert(person1.name + '来自实例对象1') // Jerry来自实例对象1
+    // alert(person2.name + '来自实例对象2') // Tom来自实例对象2
+    delete person1.name
+    // alert(person1.name + '来自实例对象1') // Tom来自实例对象1
+
+    // alert(person1.hasOwnProperty('name')) // false 不是实例对象的属性就返回false
+    // alert("name" in person1) // true 能够访问到name属性就返回true
+
+    // 确定是不是原型中的属性（in操作符返回true 且 hasOwnProperty()方法返回false）
+    function hasPrototypeProperty(obj, name) {
+      return (name in obj) && !obj.hasOwnProperty(name)
+    }
+    alert(hasPrototypeProperty(person1, 'name')) // true 是来自原型
+    person1.name = 'Lily'
+    alert(hasPrototypeProperty(person1, 'name')) // false 不来自原型
+  </script>
+</body>
+
+</html>
