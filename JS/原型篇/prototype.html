@@ -35,9 +35,71 @@
     function hasPrototypeProperty(obj, name) {
       return (name in obj) && !obj.hasOwnProperty(name)
     }
-    alert(hasPrototypeProperty(person1, 'name')) // true 是来自原型
+    // alert(hasPrototypeProperty(person1, 'name')) // true 是来自原型
     person1.name = 'Lily'
-    alert(hasPrototypeProperty(person1, 'name')) // false 不来自原型
+    // alert(hasPrototypeProperty(person1, 'name')) // false 不来自原型
+
+    // 获取实例属性
+    // Object.keys()，仅列出可枚举的
+    // Object.getOwnPropertyNames()，列出所有包括constructor
+
+    // 设置原型对象的constructor Object.defineProperty()
+
+    // 组合使用构造函数模式和原型模式
+    function Person1(name, age) {
+      this.name = name
+      this.age = age
+      this.friends = ["Tom", "Jerry"]
+    }
+    Person1.prototype = {
+      constructor: "Person1",
+      sayName: function () {
+        alert(this.name)
+      }
+    }
+    var person3 = new Person1("xiaoming", 20)
+    var person4 = new Person1("hong", 18)
+    person3.friends.push("Nan")
+    alert(person3.friends) // "Tom", "Jerry", "Nan"
+    alert(person4.friends) // "Tom", "Jerry"
+    // person3.friends === person4.friends;person3.sayName !== person4.sayName
+
+    // 动态原型模式
+    function Person2(name, age) {
+      this.name = name
+      this.age = age
+      if (typeof this.sayName != "function") {
+        Person2.prototype.sayName = function () {
+          alert(this.name)
+        }
+      }
+    }
+    var friend = new Person2("Bai", 17)
+    friend.sayName()
+    // 使用动态原型模式时，不能使用对象字面量重写原型
+
+    // 寄生构造函数模式
+    function PersonJi(name, age) { // 除了这里是包装函数外，其他和工厂模式一模一样
+      var o = new Object()
+      o.name = name
+      o.age = age
+      o.sayName = function () {
+        alert(this.name)
+      }
+      return o
+    }
+    var friendJi = new PersonJi("Hei", 22)
+    friendJi.sayName() // Hei
+    function SpecialArray() {
+      var arr = new Array()
+      arr.push.apply(arr, arguments)
+      arr.toPipedString = function () {
+        return this.join("|")
+      }
+      return arr
+    }
+    var colors = new SpecialArray("red", "pink", "blue")
+    alert(colors.toPipedString()) // red|pink|blue
   </script>
 </body>
 
