@@ -54,14 +54,14 @@
     Person1.prototype = {
       constructor: "Person1",
       sayName: function () {
-        alert(this.name)
+        // alert(this.name)
       }
     }
     var person3 = new Person1("xiaoming", 20)
     var person4 = new Person1("hong", 18)
     person3.friends.push("Nan")
-    alert(person3.friends) // "Tom", "Jerry", "Nan"
-    alert(person4.friends) // "Tom", "Jerry"
+    // alert(person3.friends) // "Tom", "Jerry", "Nan"
+    // alert(person4.friends) // "Tom", "Jerry"
     // person3.friends === person4.friends;person3.sayName !== person4.sayName
 
     // 动态原型模式
@@ -70,7 +70,7 @@
       this.age = age
       if (typeof this.sayName != "function") {
         Person2.prototype.sayName = function () {
-          alert(this.name)
+          // alert(this.name)
         }
       }
     }
@@ -84,7 +84,7 @@
       o.name = name
       o.age = age
       o.sayName = function () {
-        alert(this.name)
+        // alert(this.name)
       }
       return o
     }
@@ -99,7 +99,110 @@
       return arr
     }
     var colors = new SpecialArray("red", "pink", "blue")
-    alert(colors.toPipedString()) // red|pink|blue
+    // alert(colors.toPipedString()) // red|pink|blue
+
+    let animal = {
+      eats: true,
+      walk() {
+        if (!this.isSleeping) {
+          alert(`I walk`);
+        }
+      },
+      sleep() {
+        this.isSleeping = true;
+      }
+    }
+    let rabbit = {
+      jumps: true,
+      name: "White Rabbit",
+      __proto__: animal
+    }
+    rabbit.walk = function () {
+      alert("Rabbit! Bounce-bounce!");
+    };
+    // rabbit.__proto__ = animal
+    // rabbit.walk() // animal walk
+    // rabbit.sleep(); // rabbit.isSleeping: true,animal.isSleeping: undefined（原型中没有此属性）
+    // animal.sleep(); // rabbit.isSleeping: true,animal.isSleeping: true
+    // alert(rabbit.isSleeping);
+    // alert(animal.isSleeping);
+
+    // alert(Object.keys(rabbit)) // jumps,name,walk
+    // for (let prop in rabbit) alert(prop) // jumps name walk eats sleep
+    // for..in 循环也会迭代继承的属性。
+    // 想排除继承的属性，有一个内建方法 obj.hasOwnProperty(key)
+    for (let prop in rabbit) {
+      let own = rabbit.hasOwnProperty(prop)
+      if (own) {
+        // alert(`our:${prop}`) // jumps,name,walk
+      } else {
+        // alert(prop) // eats sleep
+      }
+    }
+
+    let user = {
+      name: 'Tom',
+      surname: 'Smith',
+      set fullName(value) { // value = "Alice Cooper"
+        [this.name, this.surname] = value.split(" ")
+        // this不受原型影响，始终是点符号 . 前面的对象。
+        // setter 调用 admin.fullName= 使用 admin 作为 this，而不是 user
+        // 当继承的对象运行继承的方法时，它们将仅修改自己的状态，而不会修改大对象的状态。
+      },
+      get fullName() {
+        return `${this.name} ${this.surname}`
+      }
+    }
+    let admin = {
+      __proto__: user,
+      isAdmin: true
+    }
+    // alert(admin.fullName) // Tom Smith ,从get中拿到的
+    // alert(user.fullName) // Tom Smith
+    admin.fullName = "Alice Cooper"
+    // alert(admin.fullName) // Alice Cooper ，重新set的
+    // alert(user.fullName) // Tom Smith
+
+    // ===============================================================================
+    let father = {
+      handsome: true
+    }
+    function Children(name) {
+      this.name = name
+    }
+    alert(Children.prototype.constructor == Children) // true
+
+    Children.prototype = father
+    let children1 = new Children("xiaoming") // children1.__proto__ == father
+    alert(children1.handsome) // true
+    let children2 = new children1.constructor("xiaohong");
+    alert(children1.constructor === children2.constructor)
+    // alert(children1.constructor === Children) // false
+
+    let hamster = {
+      stomach: [],
+      eat(food) {
+        // 分配给 this.stomach 而不是 this.stomach.push
+        this.stomach = [food]; // apple <nothing>
+        // this.stomach.push(food) // apple apple
+
+        // this.stomach= 不会执行对 stomach 的查找。该值会被直接写入 this 对象
+        // this.stomach.push() 需要找到 stomach 属性，然后对其调用 push，
+        // 于是顺着原型链向上查找拿到了hamster的stomach属性
+      }
+    };
+    let speedy = {
+      __proto__: hamster
+    };
+    let lazy = {
+      __proto__: hamster
+    };
+    // 仓鼠 Speedy 找到了食物
+    speedy.eat("apple");
+    alert(speedy.stomach); // apple
+    // 仓鼠 Lazy 的胃是空的
+    alert(lazy.stomach); // <nothing>
+
   </script>
 </body>
 
