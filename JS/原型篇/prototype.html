@@ -10,41 +10,6 @@
 
 <body>
   <script>
-    function Person() { }
-    Person.prototype.name = 'Tom'
-    Person.prototype.age = 29
-    Person.prototype.sayName = function () {
-      alert(this.name + '来自原型')
-    }
-    var person1 = new Person()
-    var person2 = new Person()
-    // alert(Person.prototype.isPrototypeOf(person1)) // true 有指向关系
-    // alert(Object.getPrototypeOf(person1).name) // Tom 来自原型
-
-    person1.name = 'Jerry'
-    // alert(person1.hasOwnProperty('name')) // true 来自实例
-    // alert(person1.name + '来自实例对象1') // Jerry来自实例对象1
-    // alert(person2.name + '来自实例对象2') // Tom来自实例对象2
-    delete person1.name
-    // alert(person1.name + '来自实例对象1') // Tom来自实例对象1
-
-    // alert(person1.hasOwnProperty('name')) // false 不是实例对象的属性就返回false
-    // alert("name" in person1) // true 能够访问到name属性就返回true
-
-    // 确定是不是原型中的属性（in操作符返回true 且 hasOwnProperty()方法返回false）
-    function hasPrototypeProperty(obj, name) {
-      return (name in obj) && !obj.hasOwnProperty(name)
-    }
-    // alert(hasPrototypeProperty(person1, 'name')) // true 是来自原型
-    person1.name = 'Lily'
-    // alert(hasPrototypeProperty(person1, 'name')) // false 不来自原型
-
-    // 获取实例属性
-    // Object.keys()，仅列出可枚举的
-    // Object.getOwnPropertyNames()，列出所有包括constructor
-
-    // 设置原型对象的constructor Object.defineProperty()
-
     // 组合使用构造函数模式和原型模式
     function Person1(name, age) {
       this.name = name
@@ -127,19 +92,6 @@
     // alert(rabbit.isSleeping);
     // alert(animal.isSleeping);
 
-    // alert(Object.keys(rabbit)) // jumps,name,walk
-    // for (let prop in rabbit) alert(prop) // jumps name walk eats sleep
-    // for..in 循环也会迭代继承的属性。
-    // 想排除继承的属性，有一个内建方法 obj.hasOwnProperty(key)
-    for (let prop in rabbit) {
-      let own = rabbit.hasOwnProperty(prop)
-      if (own) {
-        // alert(`our:${prop}`) // jumps,name,walk
-      } else {
-        // alert(prop) // eats sleep
-      }
-    }
-
     let user = {
       name: 'Tom',
       surname: 'Smith',
@@ -164,44 +116,9 @@
     // alert(user.fullName) // Tom Smith
 
     // ===============================================================================
-    let father = {
-      handsome: true
-    }
-    function Children(name) {
-      this.name = name
-    }
-    alert(Children.prototype.constructor == Children) // true
 
-    Children.prototype = father
-    let children1 = new Children("xiaoming") // children1.__proto__ == father
-    alert(children1.handsome) // true
-    let children2 = new children1.constructor("xiaohong");
-    alert(children1.constructor === children2.constructor)
-    // alert(children1.constructor === Children) // false
 
-    let hamster = {
-      stomach: [],
-      eat(food) {
-        // 分配给 this.stomach 而不是 this.stomach.push
-        this.stomach = [food]; // apple <nothing>
-        // this.stomach.push(food) // apple apple
 
-        // this.stomach= 不会执行对 stomach 的查找。该值会被直接写入 this 对象
-        // this.stomach.push() 需要找到 stomach 属性，然后对其调用 push，
-        // 于是顺着原型链向上查找拿到了hamster的stomach属性
-      }
-    };
-    let speedy = {
-      __proto__: hamster
-    };
-    let lazy = {
-      __proto__: hamster
-    };
-    // 仓鼠 Speedy 找到了食物
-    speedy.eat("apple");
-    alert(speedy.stomach); // apple
-    // 仓鼠 Lazy 的胃是空的
-    alert(lazy.stomach); // <nothing>
 
   </script>
 </body>
