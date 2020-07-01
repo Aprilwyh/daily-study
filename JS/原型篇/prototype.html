@@ -66,57 +66,33 @@
     var colors = new SpecialArray("red", "pink", "blue")
     // alert(colors.toPipedString()) // red|pink|blue
 
-    let animal = {
-      eats: true,
-      walk() {
-        if (!this.isSleeping) {
-          alert(`I walk`);
+
+    let dictionary = Object.create(null, {
+      toString: {
+        value() {
+          return Object.keys(this).join();
         }
-      },
-      sleep() {
-        this.isSleeping = true;
       }
-    }
-    let rabbit = {
-      jumps: true,
-      name: "White Rabbit",
-      __proto__: animal
-    }
-    rabbit.walk = function () {
-      alert("Rabbit! Bounce-bounce!");
-    };
-    // rabbit.__proto__ = animal
-    // rabbit.walk() // animal walk
-    // rabbit.sleep(); // rabbit.isSleeping: true,animal.isSleeping: undefined（原型中没有此属性）
-    // animal.sleep(); // rabbit.isSleeping: true,animal.isSleeping: true
-    // alert(rabbit.isSleeping);
-    // alert(animal.isSleeping);
+    });
 
-    let user = {
-      name: 'Tom',
-      surname: 'Smith',
-      set fullName(value) { // value = "Alice Cooper"
-        [this.name, this.surname] = value.split(" ")
-        // this不受原型影响，始终是点符号 . 前面的对象。
-        // setter 调用 admin.fullName= 使用 admin 作为 this，而不是 user
-        // 当继承的对象运行继承的方法时，它们将仅修改自己的状态，而不会修改大对象的状态。
-      },
-      get fullName() {
-        return `${this.name} ${this.surname}`
-      }
-    }
-    let admin = {
-      __proto__: user,
-      isAdmin: true
-    }
-    // alert(admin.fullName) // Tom Smith ,从get中拿到的
-    // alert(user.fullName) // Tom Smith
-    admin.fullName = "Alice Cooper"
-    // alert(admin.fullName) // Alice Cooper ，重新set的
-    // alert(user.fullName) // Tom Smith
+    // 添加一些数据
+    dictionary.apple = "Apple";
+    dictionary.__proto__ = "test"; // 这里 __proto__ 是一个常规的属性键
 
-    // ===============================================================================
+    // 在循环中只有 apple 和 __proto__
+    for (let key in dictionary) {
+      // alert(key); // "apple", then "__proto__"
+    }
 
+    // 你的 toString 方法在发挥作用
+    // alert(dictionary); // "apple,__proto__"
+
+    let arr = [1, 2, 3, 4, 5, 6, 7]
+    function checkAdult(arr, index) {
+      return arr[index] % 2 === 1
+    }
+    let arr1 = arr.filter(checkAdult)
+    alert(arr1)
 
 
 
