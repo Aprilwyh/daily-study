@@ -105,18 +105,21 @@ var obj = {
   a: 2,
   foo: foo
 };
-var bar = obj.foo;
+var bar = obj.foo; // * 【函数别名】
 var a = "global";
 bar(); // ???
 ```
 > "global"
+看起来似乎是bar -> obj -> foo，this应该指向obj。但是
+实际上bar引用的是foo函数本身，bar指向了一个函数的别名（obj.foo，即foo）
 bar的调用位置：全局。this指向全局
+**这就是隐式丢失**
 
 ```javascript
 function foo() {
   console.log(this.a);
 }
-function doFoo(fn) {
+function doFoo(fn) { // *【参数传递】
   fn();
 }
 var obj = {
@@ -127,7 +130,15 @@ var a = "global";
 doFoo(obj.foo); // ???
 ```
 > "global"
-doFoo的调用位置：全局。this指向全局
+看起来似乎是doFoo -> obj -> foo，this应该指向obj。但是
+实际上参数传递其实是一种隐式赋值，doFoo还是直接调用了foo
+doFoo的调用位置：全局。this指向全局（同上）
+
+```javascript
+function foo() {
+  
+}
+```
 
 
 
