@@ -171,8 +171,53 @@ foo(); // ???
 哪怕foo()的调用位置是全局也不怕了。
 
 关于**硬绑定**
+```javascript
+function foo() {
+  console.log(this.a);
+}
+var obj = {
+  a: 2
+};
+var bar = function() {
+  foo.call(obj);
+};
+bar(); // ???
+setTimeout(bar, 100); // ???
+bar.call(window); // ???
+```
+> 2 2 2
+硬绑定的bar不会再修改this
 
+ES5为硬绑定提供了内置的方法
+Function.prototype.bind
+```javascript
+function foo(something) {
+  console.log(this.a, something);
+  return this.a + something;
+}
+var obj = {
+  a: 2
+};
+var bar = foo.bind(obj);
+var b = bar(3); // ???
+console.log(b); // ???
+```
+> 2, 3; 5
+bind(...)会返回一个硬编码的新函数，把指定的参数设置为this的上下文并调用原始函数。
 
+### new绑定
+```javascript
+function foo(a) {
+  this.a = a;
+}
+var bar = new foo(2);
+console.log(bar.a); // ???
+```
+> 2
+使用new调用foo()时，会把构造的新对象绑定到foo()调用中的this上，这就是**new绑定**
+
+影响函数调用时的this绑定行为有哪些???
+> 默认绑定、隐式绑定（隐式丢失）、显示绑定（硬绑定）、new绑定
 
 
 
