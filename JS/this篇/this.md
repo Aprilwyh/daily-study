@@ -64,7 +64,7 @@ foo()在严格模式下运行，默认绑定无法绑定到全局对象
 foo()在严格模式下调用，不影响默认绑定
 
 ### this的隐式绑定
-调用位置是否有上下文
+要看调用位置是否有上下文。**隐式绑定**是指在一个对象内部包含一个指向函数的属性，通过这个属性间接引用函数，从而把this间接（隐式）绑定到这个对象上。隐式绑定会对this的指向产生什么影响呢？看下面的几个例子
 ```javascript
 function foo() {
   console.log(this.a);
@@ -136,13 +136,88 @@ doFoo的调用位置：全局。this指向全局（同上）
 
 ```javascript
 function foo() {
-  
+  console.log(this.a);
 }
+var obj = {
+  a: 2,
+  foo: foo
+};
+var a = "global";
+setTimeOut(obj.foo, 100);
 ```
+> "global"
+回调函数丢失this绑定
+bar的调用位置：全局。this指向全局（同上）
 
+综上，间接引用函数可能会产生意想不到的结果，那怎么办呢？
+让我们用显示绑定固定this来修复。
 
+### this的显示绑定
+**显示绑定**即直接指定this的绑定对象，让this只指向我们想指向的对象
+使用call(...)和apply(...)
+```javascript
+function foo() {
+  console.log(this.a);
+}
+var obj = {
+  a: 2
+};
+var a = "global";
+foo.call(obj); // ???
+foo(); // ???
+```
+> 2 "global"
+看到差别了吗？使用了call直接让this指向obj，访问obj其中的属性。
+哪怕foo()的调用位置是全局也不怕了。
 
+关于**硬绑定**
+```javascript
+function foo() {
+  console.log(this.a);
+}
+var obj = {
+  a: 2
+};
+var bar = function() {
+  foo.call(obj);
+};
+bar(); // ???
+setTimeout(bar, 100); // ???
+bar.call(window); // ???
+```
+> 2 2 2
+硬绑定的bar不会再修改this
 
+ES5为硬绑定提供了内置的方法
+Function.prototype.bind
+```javascript
+function foo(something) {
+  console.log(this.a, something);
+  return this.a + something;
+}
+var obj = {
+  a: 2
+};
+var bar = foo.bind(obj);
+var b = bar(3); // ???
+console.log(b); // ???
+```
+> 2, 3; 5
+bind(...)会返回一个硬编码的新函数，把指定的参数设置为this的上下文并调用原始函数。
+
+### new绑定
+```javascript
+function foo(a) {
+  this.a = a;
+}
+var bar = new foo(2);
+console.log(bar.a); // ???
+```
+> 2
+使用new调用foo()时，会把构造的新对象绑定到foo()调用中的this上，这就是**new绑定**
+
+影响函数调用时的this绑定行为有哪些???
+> 默认绑定、隐式绑定（隐式丢失）、显示绑定（硬绑定）、new绑定
 
 
 
