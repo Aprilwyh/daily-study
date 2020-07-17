@@ -87,13 +87,16 @@
     // 你的 toString 方法在发挥作用
     // alert(dictionary); // "apple,__proto__"
 
-    let arr = [1, 2, 3, 4, 5, 6, 7]
-    function checkAdult(arr, index) {
-      return arr[index] % 2 === 1
-    }
-    let arr1 = arr.filter(checkAdult)
-    alert(arr1)
-
+    function Bar() { }
+    function Foo() { }
+    Bar.prototype.name = 'bar';
+    Foo.prototype.name = 'foo';
+    var test2 = new Bar();
+    console.log(test2.name);
+    // Bar.prototype = Object.create(Foo.prototype);
+    Object.setPrototypeOf(Bar.prototype, Foo.prototype);
+    var test3 = new Foo();
+    console.log(test3.name);
 
 
   </script>
