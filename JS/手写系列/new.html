@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        实现new之前首先要明白它有哪些特性<br>
+        使用new创建的实例<br>
+        <ul>
+            <li>能访问到构造函数里的属性</li>
+            <li>能访问到原型中的属性</li>
+        </ul>
+        <hr>
+        new Foo()执行时会发生以下事情：
+        <ol>
+            <li>一个继承自Foo.prototype的新对象被创建</li>
+            <li>使用指定参数调用Foo，并将this绑定到新创建的对象</li>
+            <li>构造函数返回的对象就是new表达式的结果，如果没有显示返回一个对象则用步骤1创建的对象</li>
+        </ol>
+        <hr>
+        <h2>模拟实现</h2>
+    </div>
+    <script>
+        function create() {
+            // 创建一个空的对象
+            var obj = new Object();
+            // 获得构造函数，arguments中去除第一个参数(第一个参数是构造函数的名字)
+            Con = [].shift.call(arguments); // arguments是类数组，不能直接使用shift方法
+            // 类数组转数组
+            // [].slice.call(arguments); 等同于Array.prototype.slice.call(arguments)
+            // Array.from(arguments);
+            // [...arguments];
+            // [].forEach.call(arguments,function(){
+            //...
+            // })
+            // 还可以利用apply、bind
+
+            // 链接到原型，obj可以访问到构造函数原型中的属性
+            obj.__proto__ = Con.prototype;
+            // 绑定this实现继承，obj可以访问到构造函数中的属性
+            Con.apply(obj, arguments);
+            // 返回对象
+            return obj;
+        }
+        // 测试用例
+        function Cat(color) {
+            this.color = color;
+        }
+        Cat.prototype.start = function () {
+            console.log(this.color + " cat start");
+        }
+        var car = create(Cat, "black");
+        console.log(car.color);
+        car.start();
+    </script>
+</body>
+
+</html>
