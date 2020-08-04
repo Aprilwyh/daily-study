@@ -4,16 +4,38 @@
 screenLeft screenTop（screenX screenY）  
 moveTo() moveBy() // 不适用框架，只能对最外层window对象使用
 #### 窗口大小
-innerWidth innerHeight outerWidth outerHeight
-document.documentElement.clientWidth document.documentElement.clientHeight // 视口大小
-resizeTo() resizeBy() // 不适用框架，只能对最外层window对象使用
+window.innerWidth/innerHeight（包括了滚动条）/ outerWidth outerHeight  
 
+document.documentElement.clientWidth/clientHeight // 视口大小（不包含滚动条）  
 
-只有在窗口是同源的时，窗口才能自由访问彼此的内容（相同的协议://domain:port）。[跨窗口通信]()
+resizeTo() resizeBy() // 不适用框架，只能对最外层window对象使用  
 
-window.open / window.opener
-
-### 跨窗口通信
+documentElement.scrollWidth/scrollHeight 测量文档的完整大小  
+但是在该元素上，对于整个文档，这些属性均无法正常工作。  
+为了可靠地获得完整的文档高度（包括滚动出去的部分），我们应该采用以下这些属性的最大值：
+```js
+let scrollHeight = Math.max(
+  document.body.scrollHeight, document.documentElement.scrollHeight,
+  document.body.offsetHeight, document.documentElement.offsetHeight,
+  document.body.clientHeight, document.documentElement.clientHeight
+);
+```
+#### 窗口滚动
+特殊方法 window.scrollBy(x,y) 和 window.scrollTo(pageX,pageY)  
+elem.scrollIntoView(true / false) true顶部 false底部  
+禁止滚动 document.body.style.overflow = "hidden"
+##### 获得当前滚动
+DOM 元素的当前滚动状态在 elem.scrollLeft/scrollTop 中，但存在兼容问题（较旧的浏览器不行）  
+针对这个问题，只需记住以下，因为滚动在 window.pageXOffset/pageYOffset 中都可用  
+window.pageXOffset/pageXOffset（只读）
+#### 打开窗口
+window.open() window.close()
+#### 窗口弹窗访问
+只有在窗口是同源的时，窗口才能自由访问彼此的内容（相同的协议://domain:port）。[跨窗口通信](#diff)  
+window.open() 从窗口访问弹窗 / window.opener() 从弹窗访问窗口
+#### 弹窗的聚焦、失焦
+window.focus() 和 window.blur()
+### <span id="diff">跨窗口通信</span>
 两个具有不同域的 URL 具有不同的源。  
 获取iframe子元素  
 - iframe.contentWindow 来获取 <iframe> 中的 window。  
@@ -27,3 +49,14 @@ window.open / window.opener
 ```js
 document.domain = 'site.com'; // 每个窗口都执行这行代码
 ```
+
+
+### 总结
+window对象的方法
+- open() close()
+- setTimeout() clearTimeout() setInterval() clearInterval()
+- alert() confirm() prompt()
+
+### 参考
+[Window 大小和滚动](https://zh.javascript.info/size-and-scroll-window)
+[弹窗和 window 的方法](https://zh.javascript.info/popup-windows)
