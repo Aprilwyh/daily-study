@@ -52,7 +52,7 @@ document.domain = 'site.com'; // 每个窗口都执行这行代码
 
 
 ### 总结
-window对象的方法
+window对象是BOM的核心，window对象指当前的浏览器窗口。window对象的方法
 - open() close()
 - setTimeout() clearTimeout() setInterval() clearInterval()
 - alert() confirm() prompt()
