@@ -53,4 +53,43 @@ module.exports = {
 ```
 
 ### 3. 打包
-npm run build 进行打包，左侧目录结构中生成dist文件夹，其中包含bundle.js打包文件。  
+**npm run build**进行打包，左侧目录结构中生成dist文件夹，其中包含bundle.js打包文件。  
+打包过程中会产生警告  
+> WARNING in configuration
+The 'mode' option has not been set, webpack will fallback to 'production' for this value. Set 'mode' option to 'development' or 'production' to enable defaults for each environment.
+You can also set it to 'none' to disable any default behavior. Learn more: https://webpack.js.org/configuration/mode/
+
+这是因为没有指定打包模式，需要添加配置
+```js
+module.exports = {
+  mode: 'production', // 生产环境
+  // mode: 'development', // 开发环境
+}
+```
+上述两种模式的区别
+- 生产环境： 打包文件大小较小，打包文件中去除无用空格等，对代码进行了压缩，不方便阅读。
+- 开发环境： 打包文件大小较大，打包文件可读，开发时使用此种模式。
+
+### 4. 测试
+index.html引入bundle.js进行测试，会发现浏览器报错
+> vue.runtime.esm.js:620 [Vue warn]: You are using the runtime-only build of Vue where the template compiler is not available. Either pre-compile the templates into render functions, or use the compiler-included build.
+(found in <Root>)  
+
+原因是因为Vue打包生成三个文件
+- runtime only 的文件 vue.common.js // 默认
+- compiler only 的文件 compiler.js
+- runtime + compiler 的文件 vue.js
+在webpack中添加别名的配置
+```js
+module.exports = {
+  resolve: {
+    alias: {
+      'vue': 'vue/dist/vue.js' // 导入vue的时候其实导入的是vue下的dist中的vue.js
+    }
+  }
+}
+```
+
+### 小结
+- webpack本身只能打包js文件，如果要打包其他文件就需要借助于loader
+- loader是专门用于打包特定文件的处理程序
