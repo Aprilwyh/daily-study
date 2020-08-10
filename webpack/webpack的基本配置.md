@@ -90,6 +90,42 @@ module.exports = {
 }
 ```
 
+### 5. 其他loader的配置
+这里以file-loader为例
+```js
+module.exports = {
+  // ...
+  // 打包规则 中添加
+  module: {
+    rules: [{
+      // ...
+    }, {
+      test: /\.(jpg|jpeg|png|svg)$/,
+      loader: 'file-loader',
+      options: {
+        name: '[name].[ext]' // 命名规则：原文件名.原文件后缀。详细见官网
+      }
+    }]
+  }
+}
+```
+
+### 6. 打包css文件
+webpack通过css-loader和style-loader来打包css文件  
+npm install -D style-loader
+```js
+// 打包规则
+module: {
+  rules: [
+  // ...
+  {
+    test: /\.css$/,
+    use: ['style-loader', 'css-loader'] // 依赖多个loader就要使用use，值为数组，顺序有讲究
+  }]
+},
+```
+注意：执行顺序是从右到左，从下到上
+
 ### 小结
 - webpack本身只能打包js文件，如果要打包其他文件就需要借助于loader
 - loader是专门用于打包特定文件的处理程序
