@@ -2,149 +2,185 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        #container {
-            width: 100%;
-            height: 200px;
-            line-height: 200px;
-            text-align: center;
-            color: #fff;
-            background-color: antiquewhite;
-            font-size: 30px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #container {
+      width: 100%;
+      height: 200px;
+      line-height: 200px;
+      text-align: center;
+      color: #fff;
+      background-color: antiquewhite;
+      font-size: 30px;
+    }
+  </style>
 </head>
 
 <body>
-    <button id="button">手动取消节流</button>
-    <div id="container"></div>
-    <script>
-        var count = 1;
-        var container = document.getElementById('container');
-        function getCount(e) {
-            container.innerHTML = count++;
-            console.log(this);
-            console.log(e);
-            return function () {
-                alert(count);
-            }
+  <button id="button">手动取消节流</button>
+  <div id="container"></div>
+  <script>
+    var count = 1;
+    var container = document.getElementById('container');
+    function getCount(e) {
+      container.innerHTML = count++;
+      console.log(this);
+      console.log(e);
+      return function () {
+        alert(count);
+      }
+    }
+    // 使用时间戳
+    function throttle(func, wait) {
+      var context, args;
+      var previous = 0;
+      return function () {
+        var now = +new Date(); // 时间戳
+        context = this;
+        args = arguments;
+        if (now - previous > wait) {
+          func.apply(context, args);
+          previous = now;
         }
-        // 使用时间戳
-        function throttle(func, wait) {
-            var context, args;
-            var previous = 0;
-            return function () {
-                var now = +new Date(); // 时间戳
-                context = this;
-                args = arguments;
-                if (now - previous > wait) {
-                    func.apply(context, args);
-                    previous = now;
-                }
-            }
-        }
-        // container.onmousemove = throttle(getCount, 1000);
+      }
+    }
+    // container.onmousemove = throttle(getCount, 1000);
 
-        // 使用定时器
-        function throttle1(func, wait) {
-            var timeout;
-            var previous = 0;
-            return function () {
-                context = this;
-                args = arguments;
-                if (!timeout) {
-                    timeout = setTimeout(function () {
-                        timeout = null;
-                        func.apply(context, args);
-                    }, wait);
-                }
-            }
+    // 使用定时器
+    function throttle1(func, wait) {
+      var timeout;
+      var previous = 0;
+      return function () {
+        context = this;
+        args = arguments;
+        if (!timeout) {
+          timeout = setTimeout(function () {
+            timeout = null;
+            func.apply(context, args);
+          }, wait);
         }
-        // container.onmousemove = throttle1(getCount, 3000);
+      }
+    }
+    // container.onmousemove = throttle1(getCount, 3000);
 
-        // 双剑合璧
-        function throttle2(func, wait) {
-            var timeout, context, args;
-            var previous = 0; // 之前的时间戳
-            var later = function () {
-                previous = +new Date();
-                timeout = null;
-                func.apply(context, args);
-            };
-            var throttled = function () {
-                var now = +new Date();
-                // 下次触发 func 剩余的时间
-                var remaining = wait - (now - previous);
-                context = this;
-                args = arguments;
-                // 如果没有剩余的时间了或者更改了系统时间
-                if (remaining <= 0 || remaining > wait) {
-                    if (timeout) {
-                        clearTimeout(timeout);
-                        timeout = null;
-                    }
-                    previous = now;
-                    func.apply(context, args);
-                } else if (!timeout) {
-                    timeout = setTimeout(later, remaining);
-                }
-            };
-            return throttled;
+    // 双剑合璧
+    function throttle2(func, wait) {
+      var timeout, context, args;
+      var previous = 0; // 之前的时间戳
+      var later = function () {
+        previous = +new Date();
+        timeout = null;
+        func.apply(context, args);
+      };
+      var throttled = function () {
+        var now = +new Date();
+        // 下次触发 func 剩余的时间
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+        // 如果没有剩余的时间了或者更改了系统时间
+        if (remaining <= 0 || remaining > wait) {
+          if (timeout) {
+            clearTimeout(timeout);
+            timeout = null;
+          }
+          previous = now;
+          func.apply(context, args);
+        } else if (!timeout) {
+          timeout = setTimeout(later, remaining);
         }
-        // container.onmousemove = throttle2(getCount, 3000);
+      };
+      return throttled;
+    }
+    // container.onmousemove = throttle2(getCount, 3000);
 
-        // 优化
-        function throttle3(func, wait, options) {
-            var timeout, context, args, result;
-            var previous = 0;
-            if (!options) options = {}; // 如果没有options，options设置为空对象
-            var later = function () {
-                previous = options.leading === false ? 0 : +new Date();
-                timeout = null;
-                func.apply(context, args);
-                if (!timeout) context = args = null;
-            };
-            var throttled = function () {
-                var now = +new Date();
-                if (!previous && options.leading === false) previous = now;
-                var remaining = wait - (now - previous);
-                context = this;
-                args = arguments;
-                if (remaining <= 0 || remaining > wait) {
-                    if (timeout) {
-                        clearTimeout(timeout);
-                        timeout = null;
-                    }
-                    previous = now;
-                    func.apply(context, args);
-                    if (!timeout) context = args = null;
-                } else if (!timeout && options.trailing !== false) {
-                    timeout = setTimeout(later, remaining);
-                }
-            };
-            return throttled;
+    // 优化
+    function throttle3(func, wait, options) {
+      var timeout, context, args, result;
+      var previous = 0;
+      if (!options) options = {}; // 如果没有options，options设置为空对象
+      var later = function () {
+        previous = options.leading === false ? 0 : +new Date();
+        timeout = null;
+        func.apply(context, args);
+        if (!timeout) context = args = null;
+      };
+      var throttled = function () {
+        var now = +new Date();
+        if (!previous && options.leading === false) previous = now;
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+        if (remaining <= 0 || remaining > wait) {
+          if (timeout) {
+            clearTimeout(timeout);
+            timeout = null;
+          }
+          previous = now;
+          func.apply(context, args);
+          if (!timeout) context = args = null;
+        } else if (!timeout && options.trailing !== false) {
+          timeout = setTimeout(later, remaining);
         }
-        container.onmousemove = throttle3(getCount, 1000);
-        /* container.onmousemove = throttle3(getCount, 1000, {
-            leading: false
-        });
-        container.onmousemove = throttle3(getCount, 1000, {
-            trailing: false
-        }); */
+      };
+      return throttled;
+    }
+    // container.onmousemove = throttle3(getCount, 1000);
+    /* container.onmousemove = throttle3(getCount, 1000, {
+      leading: false
+    }); */
+    /* container.onmousemove = throttle3(getCount, 1000, {
+        trailing: false
+    }); */
 
-        // 手动取消
-        function throttle4(func, wait, options) {
+    // 手动取消
+    function throttle4(func, wait, options) {
+      var timeout, context, args, result;
+      var previous = 0;
+      if (!options) options = {};
 
+      var later = function () {
+        previous = options.leading === false ? 0 : new Date().getTime();
+        timeout = null;
+        func.apply(context, args);
+        if (!timeout) context = args = null;
+      };
+
+      var throttled = function () {
+        var now = new Date().getTime();
+        if (!previous && options.leading === false) previous = now;
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+        if (remaining <= 0 || remaining > wait) {
+          if (timeout) {
+            clearTimeout(timeout);
+            timeout = null;
+          }
+          previous = now;
+          func.apply(context, args);
+          if (!timeout) context = args = null;
+        } else if (!timeout && options.trailing !== false) {
+          timeout = setTimeout(later, remaining);
         }
-        var setCount = throttle4(getCount, 3000);
-        container.onmousemove = setCount;
-        document.getElementById("button").addEventListener('click', function () {
-            setCount.cancel();
-        })
-    </script>
+      };
+      throttled.cancel = function () {
+        clearTimeout(timeout);
+        previous = 0;
+        timeout = null;
+      };
+
+      return throttled;
+    }
+
+    var setCount = throttle4(getCount, 3000);
+    container.onmousemove = setCount;
+    document.getElementById("button").addEventListener('click', function () {
+      setCount.cancel();
+    })
+  </script>
 </body>
 
 </html>

@@ -11,7 +11,7 @@ module.exports = {
   entry: './src/main.js',
   // 打包出口
   output: {
-    filename: 'bundle.js',
+    filename: 'bundle.js', // 打包好的文件名就叫这个
     path: path.resolve(__dirname, 'dist')
   }
 }
@@ -90,7 +90,8 @@ module.exports = {
 }
 ```
 
-### 5. 其他loader的配置
+### loader的配置
+#### 打包图片文件
 这里以file-loader为例
 ```js
 module.exports = {
@@ -110,7 +111,7 @@ module.exports = {
 }
 ```
 
-### 6. 打包css文件
+#### 打包css文件
 webpack通过css-loader和style-loader来打包css文件  
 npm install -D style-loader
 ```js
@@ -125,6 +126,126 @@ module: {
 },
 ```
 注意：执行顺序是从右到左，从下到上
+
+### 插件的配置
+插件：在某个时间点自动执行的处理程序（类似于vue生命周期函数）  
+以 html-webpack-plugin 为例，主要作用是打包结束在dist目录下生成index.html并把打包好的js文件引入到html中
+```js
+// 引入 html-webpack-plugin 插件
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = {
+  // ...
+  // 插件
+  plugins: [
+    // ...
+    // 添加插件及模板
+    new HtmlWebpackPlugin({
+      template: './index.html'  // 以根目录下这个文件为模板打包出index.html
+    })
+  ]
+}
+```
+
+### 开发环境的配置
+之前编写代码后都是手动npm run build  
+这里以 webpack-dev-server 为例，它提供了一个简单的web服务器，能够实时重新加载  
+安装完成后添加配置（更多配置查看官网）
+```js
+module.exports = {
+  // ... 
+  devServer: {
+    // 指定服务器根目录
+    contentBase: './dist',
+    // 自动打开浏览器
+    open: true
+  }
+}
+```
+package.json中也需要添加配置
+```js
+"scripts": {
+  // ...
+  "start": "webpack-dev-server"
+},
+```
+#### 热模块替换
+也叫 HMR ，允许运行时更新各种模块无需进行完全刷新。【不适用于生产环境】
+```js
+// 引入webpack插件
+const webpack = require('webpack')
+module.exports = {
+  // ... 
+  devServer: {
+    // 启用热模块替代
+    hot: true
+  },
+  // 插件
+  plugins: [
+    // ...
+    new webpack.HotModuleReplacementPlugin()
+  ],
+}
+```
+#### SourceMap
+也叫源代码映射，主要作用是开发时快速定位到出错的源代码行
+```js
+module.exports = {
+  // ... 
+  devtool: 'eval', // 详情见官网
+}
+```
+
+### 开发环境和生产环境
+- webpack.dev.js 用于开发环境
+- webpack.prod.js 用于生产环境
+package.json中配置脚本
+```js
+"scripts": {
+  // 这里是 相对路径
+  "dev": "webpack-dev-server --config ./webpack.dev.js", // npm run dev 使用开发环境的配置文件
+  "build": "webpack --config ./webpack.prod.js" // npm run build 使用生产环境的配置文件
+},
+```
+两个配置文件的公共部分提取出来，放入 webpack.base.js 中，还需使用 webpack-merge 工具（需要安装）  
+webpack.dev.js 的改造
+```js
+// 引入公共【配置文件
+const baseConfig = require('./webpack.base.js')
+// 引入 webpack-merge
+const { merge } = require('webpack-merge')
+// 开发环境的配置
+const devConfig = {
+  // 只需配置开发环境独需的配置项即可
+}
+// 最后导出合并之后的配置
+module.exports = merge(baseConfig, devConfig)
+```
+webpack.prod.js 的改造类似上述
+
+### 解析ES6语法
+#### 安装babel-loader
+npm install -D babel-loader @babel/core
+```js
+// 打包规则
+module: {
+  rules: [{
+    test: /\.js$/,
+    exclude: /node_modules/, // 不匹配 node_modules 文件夹
+    loader: 'babel-loader'
+  }]
+}
+```
+#### 创建 .babelrc 配置文件
+安装工具preset-env   npm install @babel/preset-env --save-dev  
+创建 .babelrc 配置文件，添加配置
+```js
+{
+  "presets": [
+    "@babel/preset-env"
+  ]
+}
+```
 
 ### 小结
 - webpack本身只能打包js文件，如果要打包其他文件就需要借助于loader
