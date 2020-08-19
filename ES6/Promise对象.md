@@ -1,3 +1,7 @@
+### 写在前面
+回调中添加回调，层数少还可以但多层回调函数就不好了。（回调地狱、厄运金字塔）  
+你需要Promise
+
 ### Promise的含义
 Promise是异步编程的一种解决方案，比传统方案更合理更强大
 ~~传统的解决异步方案：回调函数和事件~~
@@ -22,4 +26,15 @@ Promise对象有两个特点
    - 从Pending变为Rejected
 
 ***
+```js
+let promise = new Promise(function(resolve, reject) {
+  // executor（生产者代码）
+  // executor 只能调用一个 resolve 或一个 reject
+  // 所有其他的再对 resolve 和 reject 的调用都会被忽略
+  // resolve/reject 只需要一个参数（或不包含任何参数），并且将忽略额外的参数。
+});
+```
+
+unhandledrejection 事件  
+当Promise 被 reject 且没有 reject 处理器的时候,会触发 unhandledrejection 事件
 
