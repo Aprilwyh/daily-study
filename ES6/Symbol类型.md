@@ -22,6 +22,9 @@ let user = {
 for...in 循环中使用，会被跳过  
 Object.keys(user) 也会被忽略  
 Object.assign() 会被复制。这并不矛盾
+#### 使用场景
+1. “隐藏” 对象属性。向“属于”另一个脚本或者库的对象添加一个属性，该属性将受到保护，防止被意外使用或重写。
+2. 使用它们来改变一些内置行为。
 
 ### API
 #### 全局
@@ -52,3 +55,8 @@ alert( Symbol.keyFor(sym2) ); // id
 - Symbol.isConcatSpreadable
 - Symbol.iterator
 - Symbol.toPrimitive
+
+### 其他
+- 内置方法 Object.getOwnPropertySymbols(obj) 允许我们获取所有的 Symbol。  
+- Reflect.ownKeys(obj) 的方法可以返回一个对象的 所有 键，包括 Symbol。
+虽然 Symbol 不是 100% 隐藏的，但是上述方法在很多库中都没有被使用
