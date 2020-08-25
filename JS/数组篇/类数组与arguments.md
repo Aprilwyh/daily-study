@@ -88,6 +88,11 @@ obj.foo(temp)
 4. 第一次调用得到一个返回函数，call(this)改变了它的this指向，将它绑定为foo函数内的this，此时foo函数内的this是指向的obj，因为调用foo的是obj，结果为10。  
 综上，其实一个函数中返回另一个函数，如果没用call/apply进行显式绑定的话，调用它的都是window。
 
+#### auguments 与箭头函数
+**箭头函数没有 "arguments"**  
+如果我们在箭头函数中访问 arguments，访问到的 arguments 并不属于箭头函数，而是属于箭头函数外部的“普通”函数。  
+箭头函数也没有自身的 this，这在 this一节中已经讲到
+
 ### arguments的应用
 参数不定长  
 函数柯里化  
