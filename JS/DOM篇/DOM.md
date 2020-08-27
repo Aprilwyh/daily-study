@@ -6,6 +6,13 @@ lastChild	获取当前节点的最后一个子节点
 previousSibling	获取当前节点的前一个兄弟节点
 nextSibling	获取当前节点的后一个兄弟节点
 attributes	元素的属性列表
+#### 元素节点
+不包含文本节点或注释节点（document 不是一个元素节点）  
+children    仅那些作为元素节点的子代的节点。  
+firstElementChild，lastElementChild 第一个和最后一个子元素。  
+previousElementSibling，nextElementSibling  兄弟元素。  
+parentElement   父元素。  
+以上节点集合（类数组）使用for...of遍历（不用for...in）
 
 ### DOM节点操作
 1. 创建节点
@@ -35,3 +42,6 @@ obj.cloneNode(bool)
 ```js
 obj.replaceChild(new,old)
 ```
+6. 选择节点
+getElement*，querySelector*  
+elem.querySelector(css) 调用会返回给定 CSS 选择器的第一个元素。
