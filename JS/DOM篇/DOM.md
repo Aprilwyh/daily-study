@@ -45,3 +45,13 @@ obj.replaceChild(new,old)
 6. 选择节点
 getElement*，querySelector*  
 elem.querySelector(css) 调用会返回给定 CSS 选择器的第一个元素。
+### 其他
+1. matches
+elem.matches(css) 不会查找任何内容，它只会检查 elem 是否与给定的 CSS 选择器匹配。它返回 true 或 false。
+```js
+if (elem.matches('a[href$="zip"]')) {
+    alert("The archive reference: " + elem.href );
+}
+```
+2. closest
+elem.closest(css) 方法会查找与 CSS 选择器匹配的最近的祖先。elem 自己也会被搜索。

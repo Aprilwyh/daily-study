@@ -77,6 +77,7 @@ obj1.obj2.foo(); // ???
 再次献出真理**this永远指向最后调用它的那个对象**，obj2。
 
 以上隐式绑定好像也不是特别难对吧？
+#### 隐式丢失
 那我们来引入一个**隐式丢失**概念
 ```javascript
 function foo() {
@@ -121,10 +122,41 @@ var obj = {
   foo: foo
 };
 var a = "global";
-setTimeOut(obj.foo, 100);
+setTimeout(obj.foo, 100);
 ```
 > "global"
-这里的obj.foo作为回调函数也会丢失this绑定。其实说白了它也没有调用，也是作为参数传递的。结果还是同上。
+这里的obj.foo作为回调函数也会丢失this绑定。其实说白了它也没有调用，也是作为参数传递的。结果还是同上。  
+#### 隐式丢失的解决办法
+1. 包装器：传递一个包装函数
+```js
+var obj = {
+  a: 2,
+  foo() {
+      console.log(this.a);
+  }
+};
+var a = "global";
+setTimeout(function () {
+    obj.foo()
+}, 100) // 2
+// setTimeout(() => obj.foo(), 100)
+```
+问题是在100ms内 obj 的值改变了会调用错误的对象。  
+2. bind（见下节）
+3. 使用类字段提供的方法
+```js
+class Obj {
+    constructor(a) {
+        this.a = a;
+    }
+    foo = () => {
+        console.log(this.a)
+    }
+}
+var a = "global";
+let obj = new Obj(2);
+setTimeout(obj.foo, 100);
+```
 
 你觉得你真的懂了吗？下面这个例子输出什么呢？
 ```javascript
