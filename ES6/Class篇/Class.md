@@ -225,6 +225,104 @@ User.staticMethod = function() {
 用途：静态方法用于实现属于该类但不属于该类任何特定对象的函数。  
 也被用于与数据库相关的公共类，可以用于搜索/保存/删除数据库中的条目  
 
+## 扩展内建类
+### what
+内建的类，例如 Array，Map 等也都是可以扩展的（extendable）。内建类其实就是系统自带的类（集合）
+```js
+class PowerArr extends Array {
+  method() {
+    // ...
+  }
+}
+let arr = new PowerArr();
+// arr.filter()
+// arr.filter().method()
+```
+上面的例子中 `arr.constructor === PowerArray`  
+arr.filter() 被调用时，它的内部使用的是 arr.constructor 来创建新的结果数组，而不是使用原生的 Array
+```js
+class PowerArr extends Array {
+  method() {
+    // ...
+  }
+  // 内建方法将使用这个作为 constructor
+  static get [Symbol.species]() {
+    return Array;
+  }
+}
+let arr = new PowerArr();
+// arr.filter().method() 报错
+```
+给这个类添加一个特殊的静态 getter Symbol.species，内建方法将返回常规数组。  
+.filter 返回 Array。所以扩展的功能不再传递。结果就是会报错
+#### 内建类的继承
+内建类相互间不继承静态方法。  
+例如，Array 和 Data 都继承自 Object，所以它们的实例都有来自 Object.prototype 的方法。但 Array.[[Prototype]] 并不指向 Object，所以它们没有例如 Array.keys()（或 Data.keys()）这些静态方法。  
+### why
+1. 通过 extends 获得的继承和内建对象之间的继承的区别？
+- 前者通过原型链继承
+- Data 继承自 Object，但 Data.[[Prototype]] 并不指向 Object，所以它们没有 Object 的静态方法。Date 和 Object 之间没有连结。它们是独立的，只有 Date.prototype 继承自 Object.prototype。
+
+## 类检查 instanceof
+### what
+instanceof 操作符用于检查一个对象是否属于某个特定的 class。同时，它还考虑了继承。
+1. 普通类
+```js
+class Rabbit {}
+let rabbit = new Rabbit();
+
+// obj 隶属于 Class 类（或 Class 类的衍生类）
+alert( rabbit instanceof Rabbit ); // true
+```
+2. 构造函数
+```js
+// 构造函数，不是 class
+function Rabbit() {}
+alert( new Rabbit() instanceof Rabbit ); // true
+```
+3. 内建类
+```js
+let arr = [1, 2, 3];
+alert( arr instanceof Array ); // true
+alert( arr instanceof Object ); // true
+```
+### how
+instanceof 在检查中会将原型链考虑在内。此外，我们还可以在静态方法 Symbol.hasInstance 中设置自定义逻辑。  
+obj instanceof Class 算法的执行过程大致如下：
+1. 有静态方法 Symbol.hasInstance，那就直接调用这个方法
+```js
+// 设置 instanceOf 检查
+// 并假设具有 canEat 属性的都是 animal
+class Animal {
+  static [Symbol.hasInstance](obj) {
+    if (obj.canEat) return true;
+  }
+}
+
+let obj = { canEat: true };
+alert(obj instanceof Animal); // true：Animal[Symbol.hasInstance](obj) 被调用
+```
+2. 大多数 class 没有 Symbol.hasInstance。使用 obj instanceOf Class 检查 Class.prototype 是否等于 obj 的原型链中的原型之一。
+```
+obj.__proto__ === Class.prototype?
+obj.__proto__.__proto__ === Class.prototype?
+// 如果任意一个的答案为 true，则返回 true
+// 否则，如果我们已经检查到了原型链的尾端，则返回 false
+```
+如果 objA 处在 objB 的原型链中，则返回 true。所以，可以将 obj instanceof Class 检查改为 Class.prototype.isPrototypeOf(obj)。
+
+### typeof 的增强版 / instanceof 的替代方法
+```js
+let user = {
+  [Symbol.toStringTag]: "User"
+};
+
+alert( {}.toString.call(user) ); // [object User]
+```
+不仅能检查原始数据类型，而且适用于内建对象，更可贵的是还支持自定义。可以用 {}.toString.call 替代 instanceof。
+### more
+判断 instanceof 最重要的指标是找 prototype，与其他无关。
+
 ## 大总结
 - `extends` 语法会设置两个原型：
    1. 在构造函数的 "prototype" 之间设置原型（为了获取实例方法）。
@@ -234,4 +332,15 @@ User.staticMethod = function() {
 - super.method(...) 调用一个父类方法
 - super(...) 调用一个父类 constructor
 - 继承对常规方法和静态方法都有效
+- 内建类相互间不继承静态方法。  
+- 继承、重写、多态
+   1. 继承：extends 关键字
+   2. 重写：super 关键字
+   3. 多态：instanceof 操作符
+
+| | 用于 | 返回值 |
+| - | - | - |
+| typeof | 原始数据类型 |	string |
+| {}.toString |	原始数据类型，内建对象，包含 Symbol.toStringTag 属性的对象 | string |
+| instanceof | 对象 |	true/false |
 

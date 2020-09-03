@@ -52,9 +52,15 @@ alert( Symbol.keyFor(sym2) ); // id
 
 #### 系统
 - Symbol.hasInstance
+   > 静态方法 Symbol.hasInstance 中设置自定义逻辑。详见 Class类的相关笔记。
 - Symbol.isConcatSpreadable
 - Symbol.iterator
+   > 专门用于使对象可迭代的内置 symbol，详见 Iterator 相关笔记。
 - Symbol.toPrimitive
+- Symbol.species
+   > 给这个类添加一个特殊的静态 getter Symbol.species，内建方法将使用这个作为 constructor。详见 Class类的相关笔记。
+- Symbol.toStringTag
+   > 使用特殊的对象属性 Symbol.toStringTag 自定义对象的 toString 方法的行为。
 
 ### 其他
 - 内置方法 Object.getOwnPropertySymbols(obj) 允许我们获取所有的 Symbol。  

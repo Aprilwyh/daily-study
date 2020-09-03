@@ -7,6 +7,7 @@ var o = new C();
 o instanceof C; // true，因为 Object.getPrototypeOf(o) === C.prototype
 o instanceof D; // false，因为 D.prototype 不在 o 的原型链上
 ```
+关于 instanceof 类检查的相关细节见 class类笔记
 ### instanceof的原理
 一层一层查找 __proto__，如果和 constructor.prototype 相等则返回 true，如果一直没有查找成功则返回 false。  
 instance.[__proto__...] === instance.constructor.prototype
