@@ -85,6 +85,8 @@ module.exports = {
   resolve: {
     alias: {
       'vue': 'vue/dist/vue.js' // 导入vue的时候其实导入的是vue下的dist中的vue.js
+      // P.S. 加入别名 @ ，代表 ../src 路径
+      // '@': path.resolve(__dirname, '../src')
     }
   }
 }
