@@ -154,6 +154,82 @@ p()
 // "I am the proxy"
 ```
 
+#### has()
+has方法判断对象是否具有某个属性。典型的操作就是in运算符。  
+has(target, property)
+target — 是目标对象，被作为第一个参数传递给 new Proxy，
+property — 需查询的属性名称
+
+##### 使用场景
+- 使用has方法隐藏某些属性，不被in运算符发现
+
+##### 注意事项
+- 如果原对象不可配置或者禁止扩展，这时has拦截会报错。
+- has方法拦截的是HasProperty操作，而不是HasOwnProperty操作，即has方法不判断一个属性是对象自身的属性，还是继承的属性。
+- 虽然for...in循环也用到了in运算符，但是has拦截对for...in循环不生效（只对in运算符生效）。
+
+#### construct()
+用于拦截new命令
+
+#### 更多见 ES6 教程
+
+### Proxy.revocable()
+Proxy.revocable()方法返回一个可取消的 Proxy 实例。
+```js
+let target = {};
+let handler = {};
+let {proxy, revoke} = Proxy.revocable(target, handler);
+
+proxy.foo = 123;
+proxy.foo // 123
+
+revoke();
+proxy.foo // TypeError: Revoked
+```
+Proxy.revocable()方法返回一个对象，该对象的proxy属性是Proxy实例，revoke属性是一个函数，可以取消Proxy实例。  
+当执行revoke函数之后，再访问Proxy实例，就会抛出一个错误。
+
+#### 使用场景
+目标对象不允许直接访问，必须通过代理访问，一旦访问结束，就收回代理权，不允许再次访问。
+
+### this
+在 Proxy 代理的情况下，目标对象内部的this关键字会指向 Proxy 代理。
+```js
+const target = {
+  m: function () {
+    console.log(this === proxy);
+  }
+};
+const handler = {};
+
+const proxy = new Proxy(target, handler);
+
+target.m() // false
+proxy.m()  // true
+```
+一旦proxy代理target.m，后者内部的this就是指向proxy，而不是target。  
+有些原生对象的内部属性，只有通过正确的this才能拿到，Proxy 无法代理这些原生对象的属性。
+```js
+const target = new Date();
+const handler = {};
+const proxy = new Proxy(target, handler);
+proxy.getDate(); // TypeError: this is not a Date object.
+```
+解决办法：this 绑定原始对象
+```js
+const target = new Date('2015-01-01');
+const handler = {
+  get(target, prop) {
+    if (prop === 'getDate') {
+      return target.getDate.bind(target);
+    }
+    return Reflect.get(target, prop);
+  }
+};
+const proxy = new Proxy(target, handler);
+proxy.getDate() // 1
+```
+
 ## why
 1. let proxy = new Proxy({}, { ... }) 中的 target 设为 {} 代表什么意思？
 target 作为第一个参数代表的是所要代理的目标对象，即如果没有Proxy的介入，操作原来要访问的就是这个对象。  
