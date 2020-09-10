@@ -193,7 +193,7 @@ Proxy.revocable()方法返回一个对象，该对象的proxy属性是Proxy实�
 目标对象不允许直接访问，必须通过代理访问，一旦访问结束，就收回代理权，不允许再次访问。
 
 ### this
-在 Proxy 代理的情况下，目标对象内部的this关键字会指向 Proxy 代理。
+在 Proxy 代理的情况下，目标对象内部的this关键字会指向 Proxy 代理（而不是target）。
 ```js
 const target = {
   m: function () {
