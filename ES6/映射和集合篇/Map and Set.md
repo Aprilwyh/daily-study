@@ -1,15 +1,41 @@
-### Map 映射
-#### what
-一个带键的数据项的集合，就像一个 Object 一样。   
+## Map 映射
+### what
+一个带键的数据项的集合，就像一个 Object 一样。  
 
-#### why
-- 普通的 Object 会将键转化为字符串
-- Map 会保留键的类型，允许任何类型的键（key）
-- Map 迭代的顺序与插入值的顺序相同（与普通的 Object 不同）
+#### 属性与方法
+```js
+const m = new Map();
+const o = {p: 'Hello World'};
 
-#### how
+m.set(o, 'content')
+m.get(o) // "content"
+
+m.has(o) // true
+m.delete(o) // true
+m.has(o) // false
+
+// Map 也接受一个数组作为参数
+const map = new Map([
+  ['name', '张三'],
+  ['title', 'Author']
+]);
+
+map.size // 2
+map.clear()
+map.size // 0
+```
+- size属性返回 Map 结构的成员总数。
+- set方法设置键名key对应的键值为value，然后返回整个 Map 结构。如果key已经有值，则键值会被更新，否则就新生成该键。
+> 每一次 map.set 调用都会返回 map 本身，所以map **支持链式调用**
+
+- get方法读取key对应的键值，如果找不到key，返回undefined。
+- has方法返回一个布尔值，表示某个键是否在当前 Map 对象之中。
+- delete方法删除某个键，返回true。如果删除失败，返回false。
+- clear方法清除所有成员，没有返回值。
+
+##### 遍历方法
 使用 Map 的正确方式是使用 map 方法：set 和 get 等。**不要用map[key]**  
-每一次 map.set 调用都会返回 map 本身，所以map **支持链式调用**
+Map 的遍历顺序就是插入顺序。
 ```js
 let recipeMap = new Map([
   ['cucumber', 500],
@@ -32,9 +58,165 @@ for (let entry of recipeMap) { // 与 recipeMap.entries() 相同
   alert(entry); // cucumber,500 (and so on)
 }
 ```
-此外，Map 有内置的 forEach 方法，与 Array 类似
+- Map.prototype.keys()：返回键名的遍历器。
+- Map.prototype.values()：返回键值的遍历器。
+- Map.prototype.entries()：返回所有成员的遍历器。
+- Map.prototype.forEach()：遍历 Map 的所有成员（与 Array 类似）
 
-#### more
+#### Set和Map都可以用来生成新的 Map
+```js
+const set = new Set([
+  ['foo', 1],
+  ['bar', 2]
+]);
+const m1 = new Map(set);
+m1.get('foo') // 1
+
+const m2 = new Map([['baz', 3]]);
+const m3 = new Map(m2);
+m3.get('baz') // 3
+```
+
+#### 同一个键多次赋值，后者覆盖前者
+```js
+const map = new Map();
+
+map.set(1, 'aaa').set(1, 'bbb');
+map.get(1) // "bbb"
+```
+
+#### 同一个对象的引用才是同一个键
+```js
+const map = new Map();
+
+map.set(['a'], 555);
+map.get(['a']) // undefined
+
+const k1 = ['a'];
+const k2 = ['a'];
+
+map.set(k1, 111).set(k2, 222);
+map.get(k1) // 111
+map.get(k2) // 222
+```
+内存地址不一样，就视为两个键。（同名属性碰撞：扩展别人的库时，如果使用对象作为键名，不用担心自己的属性与原作者的属性同名。）
+
+#### 简单类型判定是否为同一个键
+- 0 和 -0 是同一个键
+- NaN 和 NaN 视为同一个键
+- 布尔 true 和字符串 true **不是**同一个键
+- undefined 和 null **不是**同一个键
+
+#### 类型转换
+1. Map 转数组
+使用扩展运算符（...）
+```js
+const map = new Map([
+  [1, 'one'],
+  [2, 'two'],
+  [3, 'three'],
+]);
+
+[...map] // [[1,'one'], [2, 'two'], [3, 'three']]
+```
+结合数组的map方法、filter方法，可以实现 Map 的遍历和过滤（Map 本身没有map和filter方法）。
+
+2. 数组转 Map
+将数组传入 Map 构造函数
+```js
+new Map([
+  [true, 7],
+  [{foo: 3}, ['abc']]
+])
+// Map {
+//   true => 7,
+//   Object {foo: 3} => ['abc']
+// }
+```
+
+3. Map 转对象
+如果所有 Map 的键都是字符串，它可以无损地转为对象。  
+```js
+function strMapToObj(strMap) {
+    let obj = Object.create(null);
+    for (let [k, v] of strMap) {
+        obj[k] = v;
+    }
+    return obj;
+}
+const myMap = new Map().set('yes', true).set('no', false);
+strMapToObj(myMap); // { yes: true, no: false }
+```
+如果有非字符串的键名，那么这个键名会被转成字符串，再作为对象的键名。
+
+4. 对象转 Map
+对象转为 Map 可以通过Object.entries()。
+```js
+let obj = {"a":1, "b":2};
+let map = new Map(Object.entries(obj));
+```
+或者自己写一个转换函数
+```js
+function objToStrMap(obj) {
+  let strMap = new Map();
+  for (let k of Object.keys(obj)) {
+    strMap.set(k, obj[k]);
+  }
+  return strMap;
+}
+
+objToStrMap({yes: true, no: false}) // Map {"yes" => true, "no" => false}
+```
+
+5. Map 转为 Json
+- Map 的键名都是字符串，这时可以选择转为对象 JSON。
+```js
+function strMapToJson(strMap) {
+  return JSON.stringify(strMapToObj(strMap)); // strMapToObj 方法在上面
+}
+
+let myMap = new Map().set('yes', true).set('no', false);
+strMapToJson(myMap) // '{"yes":true,"no":false}'
+```
+- Map 的键名有非字符串，这时可以选择转为数组 JSON。
+```js
+function mapToArrayJson(map) {
+  return JSON.stringify([...map]);
+}
+
+let myMap = new Map().set(true, 7).set({foo: 3}, ['abc']);
+mapToArrayJson(myMap) // '[[true,7],[{"foo":3},["abc"]]]'
+```
+
+6. Json 转为 Map
+- 正常情况下，所有键名都是字符串。
+```js
+function jsonToStrMap(jsonStr) {
+  return objToStrMap(JSON.parse(jsonStr));
+}
+
+jsonToStrMap('{"yes": true, "no": false}') // Map {'yes' => true, 'no' => false}
+```
+- 特殊情况：整个 JSON 就是一个数组
+```js
+function jsonToMap(jsonStr) {
+  return new Map(JSON.parse(jsonStr));
+}
+
+jsonToMap('[[true,7],[{"foo":3},["abc"]]]') // Map {true => 7, Object {foo: 3} => ['abc']}
+```
+
+### why
+1. Map 和 Object 的区别？
+- Object 只能使用字符串作为键（Object 字符--值）
+- Map 各种类型的值（包括对象）都可以当做键（Map 值--值）
+- Map 迭代的顺序与插入值的顺序相同（与普通的 Object 不同）
+
+### 小总结
+- 每一次 map.set 调用都会返回 map 本身，所以map **支持链式调用**
+- 使用 Map 的正确方式是使用 map 方法：set 和 get 等。**不要用map[key]**
+
+### more
 Object.entries() 从对象创建 Map
 ```js
 let obj = {
