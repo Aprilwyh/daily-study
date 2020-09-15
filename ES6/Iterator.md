@@ -37,10 +37,28 @@ const obj = {
 - TypedArray
 - 函数的 arguments 对象
 - NodeList 对象
+- 字符串是一个类似数组的对象，也原生具有 Iterator 接口。
 对于原生部署 Iterator 接口的数据结构，不用自己写遍历器生成函数，for...of循环会自动遍历它们。  
 当使用for...of循环遍历某种数据结构时，该循环会自动去寻找 Iterator 接口。  
 
 
+
+### 调用 Iterator 接口的场合
+1. 解构赋值
+2. 扩展运算符
+只要某个数据结构部署了 Iterator 接口，就可以对它使用扩展运算符，将其转为数组。
+3. yield*
+4. 任何接受数组作为参数的场合
+   - for...of
+   - Array.from()
+   - Map(), Set(), WeakMap(), WeakSet()（比如new Map([['a',1],['b',2]])）
+   - Promise.all()
+   - Promise.race()
+
+### 遍历器对象的方法
+- next()
+- return()
+- throw()
 
 ## Async iterator 异步迭代器
 异步迭代器（iterator）允许我们对按需通过异步请求而得到的数据进行迭代。例如，我们通过网络分段（chunk-by-chunk）下载数据时。异步生成器（generator）使这一步骤更加方便。
