@@ -57,7 +57,27 @@ return() 的执行
 - Generator 函数内部有try...finally代码块，且正在执行try代码块，那么return方法会导致立刻进入finally代码块
 
 ### yield* 表达式
-用来在 Generator 函数内部执行另一个 Generator 函数
+用来在 Generator 函数内部执行另一个 Generator 函数（后者中有 return 的时候，前者需要接收一下 return 的值）  
+本质相当于 for...of（所以只要有 Iterator 接口，就可以被yield*遍历）
+
+### this
+Generator 函数返回的遍历器就是它的实例，也继承了 Generator 函数原型上的方法。  
+- Generator 函数不能和 new 命令一起使用（Generator 毕竟不是构造函数）
+- Generator 函数的实例调用 Generator 函数内部的属性或方法时，this不指向实例对象（与构造函数不同）
+
+### 简写
+前提是作为对象属性
+```js
+let obj = {
+  foo: function* () {}
+}
+// 简写形式
+let obj = {
+  * foo() {} // 其实就是正常写法前 加个 * 号
+}
+```
+
+### 利用 yield 的暂停执行特点可以实现协程（详见异步篇）
 
 ## why
 1. yield 表达式 和 return 语句 有什么差别？  
@@ -104,11 +124,14 @@ for (let [key, value] of jane) {
 // last: Doe
 ```
 
-3. next()、throw()、return() 的共同点  
+3. next()、throw()、return() 的共同点？  
 作用都是让 Generator 函数恢复执行，并且使用不同的语句替换yield表达式。
 - next()是将yield表达式替换成一个值
 - throw()是将yield表达式替换成一个throw语句
 - return()是将yield表达式替换成一个return语句
+
+4. yield 和 yield* 的区别？
+yield 返回整个，yield* 返回遍历之后的结果（如果可遍历）
 
 ## 使用 generator 进行迭代
 ```js
@@ -123,44 +146,6 @@ let range = {
 }
 alert([...range]); // 1,2,3,4,5
 ```
-## yield* 组合 generator
-写一个公共的方法
-```js
-function* generateSequence(start, end) {
-  for (let i = start; i <= end; i++) yield i;
-}
-```
-然后使用`yield*`将一个个 generator 组合起来，生成一个更复杂的序列
-```js
-function* generatePasswordCodes() {
-  // A..Z
-  yield* generateSequence(65, 90);
-
-  // a..z
-  yield* generateSequence(97, 122);
-}
-```
-使用
-```js
-let str = '';
-for(let code of generatePasswordCodes()) {
-  str += String.fromCharCode(code);
-}
-alert(str); // A..Za..z
-```
-## yield 是一条双向路
-1. 向外返回结果 2. 将外部的值传递到 generator 内
-```js
-function* gen() {
-    // 向外部代码传递一个问题并等待答案
-    let result = yield "2 + 2 = ?";
-    alert(result);
-}
-let generator = gen();
-let question = generator.next().value; // <-- yield 返回的 value
-generator.next(question); // --> 将结果传递到 generator 中
-```
-执行过程图解见 现代JS 官网
 
 ## 总结
 - Generator 是通过 generator 函数 function* f(…) {…} 创建的。

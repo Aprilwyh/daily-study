@@ -34,7 +34,7 @@ const obj = {
 - Map
 - Set
 - String
-- TypedArray
+- TypedArray（类数组）
 - 函数的 arguments 对象
 - NodeList 对象
 - 字符串是一个类似数组的对象，也原生具有 Iterator 接口。
