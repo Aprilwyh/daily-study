@@ -13,22 +13,13 @@ class User {
     }
 }
 // alert(typeof User) // function
-alert(User === User.prototype.constructor) // true
+alert(User === User.prototype.constructor) // true （constructor属性直接指向“类”的本身）
 // 在原型中实际上有两个方法 constructor, sayHi
 let user = new User("Tom"); // 此 Tom 对应 constructor 中的形参 name
 ```
-
-### how
-```js
-class MyClass {
-  // class 方法
-  constructor() { ... }
-  method1() { ... }
-  ...
-}
-```
-使用 new MyClass() 来创建具有上述列出的所有方法的新对象。  
-new 会自动调用 constructor() 方法，因此我们可以在 constructor() 中初始化对象。  
+- new 会自动调用 constructor() 方法，因此我们可以在 constructor() 中初始化对象
+- constructor方法默认返回实例对象（即this）
+- 类的内部所有定义的方法，都是不可枚举的。
 
 #### 类表达式
 类似于函数表达式
@@ -50,7 +41,19 @@ function makeClass(phrase) {
   }
 }
 new makeClass("Tom").sayHi()
+
+// 还可以写出立即执行的 Class
+let person = new class {
+  constructor(name) {
+    this.name = name;
+  }
+  sayName() {
+    console.log(this.name);
+  }
+}('张三');
+person.sayName(); // "张三"
 ```
+
 #### Getters / setters
 ```js
 class User {
@@ -67,6 +70,7 @@ class User {
   }
 }
 ```
+
 #### Computed names [...]
 ```js
 class User {
@@ -76,16 +80,9 @@ class User {
   }
 }
 ```
-#### class 字段
-```js
-class User {
-  name = "Tom"
-}
-let user = new User()
-alert(user.name) // Tom
-alert(User.prototype.name) // undefined 不会设置到原型上
-```
-间接调用导致的 this 隐式丢失问题
+
+#### this 指向
+类的方法内部的this默认指向类的实例，间接调用导致的 this 隐式丢失问题
 ```js
 class Button {
   constructor(value) {
@@ -99,20 +96,55 @@ class Button {
 let button = new Button("hello");
 setTimeout(button.click, 100); // undefined
 ```
-具体解决方案见【this篇】，下面介绍 类字段 方法解决
+1. 构造方法中绑定this
+```js
+class Button {
+  constructor(value) {
+    this.value = value;
+    this.click = this.click.bind(this); // *
+  }
+  click() {
+    alert(this.value)
+  }
+}
+```
+2. 使用箭头函数
 ```js
 class Button {
   constructor(value) {
     this.value = value;
   }
-  click = () => {
+  click = () => { // *
     alert(this.value);
   }
 }
-let button = new Button("hello");
-setTimeout(button.click, 100);
 ```
-用途：浏览器环境中，它对于进行事件监听尤为有用。
+3. 使用 Proxy，获取方法的时候自动绑定 this  
+详见 ES6教程
+
+#### 注意点
+- 类和模块内部默认严格模式
+- 类不存在变量提升
+```js
+new Foo(); // ReferenceError
+class Foo {}
+```
+
+- 类的name属性
+```js
+class Point {}
+Point.name // "Point"
+```
+
+#### 私有属性和方法
+- 命名上加以区别，下划线开头
+- 私有方法移出模块
+- 利用Symbol的唯一性
+
+#### new target 属性
+- 返回new命令作用于的那个构造函数
+- 如果构造函数不是通过new命令或Reflect.construct()调用的返回 undefined  
+- 子类继承父类时，new.target会返回子类
 
 ### why
 1. **Class 与 构造函数的区别？**
@@ -169,7 +201,7 @@ Rabbit 和 Animal 中均有一个方法时，我们不希望完全替换父类�
 `super关键字`
 - `super.method(...)` 调用一个父类方法
 - `super(...)` 调用一个父类 constructor
-现在 super.ownFunc() 调用的就是父类中的 ownFunc 方法，this.ownFunc() 调用的就是子类中的 ownFunc 方法
+现在 super.ownFunc() 调用的就是父类中的 ownFunc 方法，this.ownFunc() 调用的就是子类中的 ownFunc 方法  
 
 需要注意的是箭头函数没有 this，它也没有 super。和获取 this 一样，super也会从外部函数获取。
 
@@ -185,7 +217,12 @@ class Rabbit extends Animal {
 ```
 继承类的 constructor 必须调用 super(...)，并且一定要在使用 this 之前调用。
 
-3. 重写类字段
+3. more
+- super指向父类的原型对象，所以定义在父类实例上的方法或属性（父类中 this.的方法或属性），是无法通过super调用的  
+- 子类普通方法中通过super调用父类的方法时，方法内部的this指向当前的子类实例。
+- super作为对象，用在静态方法之中，这时super将指向父类，而不是父类的原型对象。（因为静态 就不会被实例继承）
+- 在子类的静态方法中通过super调用父类的方法时，方法内部的this指向当前的子类，而不是子类的实例。
+> 只要和 静态 相关，就是指向自身（不是原型/实例对象）
 
 ### why
 1. class 继承和原型继承的差别？
@@ -202,10 +239,10 @@ ES5 的继承，实质是先创造子类的实例对象this，然后再将父类
 | – |	needs to call super() in constructor |
 | Rabbit.__proto__ === Function.prototype |	Rabbit.__proto__ === Object |
 ***
-## 静态属性和方法
-### what
-把一个方法赋值给类的函数本身，而不是赋给它的 "prototype"。这样的方法被称为 静态的（static）。
-#### static 关键字
+
+### 静态属性和方法
+类相当于实例的原型，所有在类中定义的方法，都会被实例继承。  
+在一个方法前，加上static关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。
 ```js
 class User {
   static publisher = "Tom";
@@ -224,6 +261,12 @@ User.staticMethod = function() {
 ```
 用途：静态方法用于实现属于该类但不属于该类任何特定对象的函数。  
 也被用于与数据库相关的公共类，可以用于搜索/保存/删除数据库中的条目  
+
+- 如果静态方法包含this关键字，这个this指的是类，而不是实例。
+- 静态方法可以与非静态方法重名。
+- 父类的静态方法，可以被子类继承。
+- 静态方法也是可以从super对象上调用的。
+
 
 ## 扩展内建类
 ### what
