@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    大致思路 <br>
+    1. 判断原生 Object 是否存在 assign2 函数，不存在就创建（利用 Object.defineProperty 定义这个新属性） <br>
+    2. 对参数判空（null == undefined，所以判断参数 == null 就间接判断了 参数 == undefined，写一个就行） <br>
+    3. 把参数通过 Object() 转为对象，最后返回（Object.assign就是返回一个新对象，所以需要转一下） <br>
+    4. 使用 for...in 遍历出可枚举的自有属性（使用hasOwnProperty获取自有属性，即非原型链上的属性），并复制给新的目标对象 <br>
+    * 是注意点，一共有四个地方。
+    <script>
+        if (typeof Object.assign2 != 'function') {
+            // Attention 1
+            Object.defineProperty(Object, "assign2", { // *
+                value: function (target) { // target 是 assign2 的第一个参数
+                    'use strict'; // *
+                    if (target == null) { // Attention 2
+                        throw new TypeError('Cannot convert undefined or null to object');
+                    }
+
+                    // Attention 3
+                    var to = Object(target); // *
+
+                    for (var index = 1; index < arguments.length; index++) { // arguments 是 assign2 的所有参数
+                        var nextSource = arguments[index];
+
+                        if (nextSource != null) {  // Attention 2
+                            // Attention 4
+                            for (var nextKey in nextSource) {
+                                if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) { // *
+                                    to[nextKey] = nextSource[nextKey];
+                                }
+                            }
+                        }
+                    }
+                    return to;
+                },
+                writable: true,
+                configurable: true
+            });
+        }
+
+        // 测试
+        let a = {
+            name: "advanced",
+            age: 18
+        }
+        let b = {
+            name: "muyiy",
+            book: {
+                title: "You Don't Know JS",
+                price: "45"
+            }
+        }
+        let c = Object.assign2(a, b);
+        console.log(c); // a === c
+    </script>
+</body>
+
+</html>
