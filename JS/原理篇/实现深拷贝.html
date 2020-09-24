@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    简单实现一版，见深浅拷贝篇 <br>
+    但还存在几点问题 <br>
+    1. 循环引用：循环检测，设置哈希表存储已拷贝过的对象，当检测到当前对象已存在于哈希表中时，取出该值并返回即可。（利用 WeakMap）
+    <script>
+        function isObject(obj) {
+            return typeof obj === 'object' && obj != null;
+        }
+        function cloneDeep2(source, hash = new WeakMap()) {
+
+            if (!isObject(source)) return source; // 非对象返回自身
+            if (hash.has(source)) return hash.get(source); // 查哈希表
+
+            var target = Array.isArray(source) ? [] : {};
+            hash.set(source, target); // 哈希表设值
+            for (var key in source) {
+                if (Object.prototype.hasOwnProperty.call(source, key)) {
+                    if (isObject(source[key])) {
+                        target[key] = cloneDeep2(source[key], hash); // 传入哈希表
+                    } else {
+                        target[key] = source[key];
+                    }
+                }
+            }
+            return target;
+        }
+    </script>
+    2. 拷贝 Symbol 类型
+</body>
+
+</html>

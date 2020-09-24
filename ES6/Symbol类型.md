@@ -7,6 +7,10 @@ Symbol("id") 不等于 Symbol("id")
 typeof Symbol() // "symbol"
 ```
 
+### 检测 Symbol 类型
+- Object.getOwnPropertySymbols(...)
+- Reflect.ownKeys(...)
+
 ### 不能与其他类型的值进行运算
 ```js
 let sym = Symbol('My symbol');
