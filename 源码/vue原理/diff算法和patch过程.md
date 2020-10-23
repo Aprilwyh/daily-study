@@ -90,7 +90,7 @@ function patch (oldVnode, vnode) {
 }
 ```
 patch函数接收两个参数oldVnode和Vnode分别代表新的节点和之前的旧节点
-- 判断两节点是否值得比较，值得比较则执行patchVnode
+- 判断两节点是否值得比较（也就是标签是否相同），值得比较则执行patchVnode
 ```js
 function sameVnode (a, b) {
   return (
@@ -107,7 +107,7 @@ function sameVnode (a, b) {
 如果两个节点都是一样的，那么就深入检查他们的子节点。（patchVnode）
 ```js
 patchVnode (oldVnode, vnode) {
-    const el = vnode.el = oldVnode.el
+    const el = vnode.el = oldVnode.el // 找到对应的真实 dom el，el 修改时，vnode.el 会同步变化
     let i, oldCh = oldVnode.children, ch = vnode.children
     if (oldVnode === vnode) return
     if (oldVnode.text !== null && vnode.text !== null && oldVnode.text !== vnode.text) {
@@ -124,18 +124,31 @@ patchVnode (oldVnode, vnode) {
     }
 }
 ```
-- 找到对应的真实 dom ，称为 el
-- 判断 Vnode 和 oldVnode 是否指向同一个对象，如果是，那么直接 return
-- 如果他们都有文本节点并且不相等，那么将 el 的文本节点设置为 Vnode 的文本节点。
-- 如果 oldVnode 有子节点而 Vnode 没有，则删除 el 的子节点
-- 如果 oldVnode 没有子节点而 Vnode 有，则将 Vnode 的子节点真实化之后添加到 el
-- 如果两者都有子节点，则执行 updateChildren 函数比较子节点，这一步很重要
+1. if (oldVnode === vnode) 引用一致认为没有变化，return
+2. 如果他们都有文本节点并且不相等，那么将 el 的文本节点设置为 Vnode 的文本节点。
+3. 如果 oldVnode 有子节点而 Vnode 没有，则删除 el 的子节点
+4. 如果 oldVnode 没有子节点而 Vnode 有，则将 Vnode 的子节点真实化之后添加到 el
+5. 如果两者都有子节点且它们不一样，则执行 updateChildren 函数比较子节点，这一步很重要
 
 ### updateChildren
-这个函数做了什么  
-- 将 Vnode 的子节点 Vch 和 oldVnode 的子节点 oldCh 提取出来
-- oldCh 和 vCh 各有两个头尾的变量 StartIdx 和 EndIdx，它们的2个变量相互比较，一共有4种比较方式。如果4种比较都没匹配，如果设置了 key，就会用 key 进行比较，在比较的过程中，变量会往中间靠，一旦 StartIdx > EndIdx 表明 oldCh 和 vCh 至少有一个已经遍历完了，就会结束比较。
+这个函数做了什么（具体核心代码见链接）  
+- 将 Vnode 的子节点 newCh 和 oldVnode 的子节点 oldCh 提取出来
+- oldCh 和 newCh 各有两个头尾的变量 StartIdx 和 EndIdx，它们的2个变量相互比较，一共有4种比较方式。如果4种比较都没匹配，如果设置了 key，就会用 key 进行比较，在比较的过程中，变量会往中间靠，一旦 StartIdx > EndIdx 表明 oldCh 和 newCh 至少有一个已经遍历完了，就会结束比较。
 
+设置 key 和不设置 key 的区别：
+- 不设key：newCh 和 oldCh 只会进行头尾两端的相互比较
+- 设置key：除了头尾两端的比较外还会从用 key 生成的对象 oldKeyToIdx 中查找匹配的节点（更高效地利用DOM）
+
+总结遍历过程的3种 DOM 操作：
+1. oldStartVnode 和 newEndVnode 值得比较，说明 oldStartVnode.el 跑到 oldEndVnode.el 后面。
+2. oldEndVnode 和 newStartVnode 值得比较，说明 oldEndVnode.el 跑到 oldStartVnode.el 前面。
+3. newCh 中的节点 oldCh 里没有，将新节点插入到 oldStartVnode.el的前面。
+
+匹配过程的结束有两个条件：
+1. oldStartIdx > oldEndIdx 表示 oldCh 先遍历完，就将多余的 newCh 根据 index 添加到 DOM 中去
+2. newStartIdx > newEndIdx 表示 newCh 先遍历完，那么就在真实 DOM 中将区间为 [oldStartIdx, oldEndIdx] 的多余节点删掉
+
+当这些节点sameVnode成功后就会紧接着执行patchVnode了，这样层层递归下去，直到将oldVnode和Vnode中的所有子节点比对完。也将dom的所有补丁都打好啦。
 ## 链
-[](https://www.cnblogs.com/wind-lanyan/p/9061684.html)
-[](https://segmentfault.com/a/1190000008782928)
+[详解vue的diff算法](https://www.cnblogs.com/wind-lanyan/p/9061684.html)  
+[解析vue2.0的diff算法](https://segmentfault.com/a/1190000008782928)
